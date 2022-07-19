@@ -1,7 +1,19 @@
-﻿### 一、开发经验
-#### 01：001-010
-1. 当编译发现大量错误的时候，从第一个看起，一个一个的解决，不要急着去看下一个错误，往往后面的错误都是由于前面的错误引起的，第一个解决后很可能都解决了。
-2. 定时器是个好东西，学会好使用它，有时候用QTimer::singleShot单次定时器和QMetaObject::invokeMethod可以解决意想不到的问题。比如在窗体初始化的时候加载一个耗时的操作，很容易卡主界面的显示，要在加载完以后才会显示界面，这就导致了体验很卡不友好的感觉，此时你可以将耗时的加载（有时候这些加载又必须在主线程，比如用QStackWidget堆栈窗体加载一些子窗体），延时或者异步进行加载，这样就会在界面显示后去执行，而不是卡主主界面。
+
+## 0 前言说明
+1. **项目作品：[https://blog.csdn.net/feiyangqingyun/article/details/97565652](https://blog.csdn.net/feiyangqingyun/article/details/97565652)**
+2. **网店地址：https://shop244026315.taobao.com/**
+3. **联系方式：QQ（517216493）微信（feiyangqingyun）推荐加微信。**
+4. **版本支持：所有项目已经全部支持Qt4/5/6所有版本以及后续版本。**
+5. 监控作品体验：[https://pan.baidu.com/s/1d7TH_GEYl5nOecuNlWJJ7g](https://pan.baidu.com/s/1d7TH_GEYl5nOecuNlWJJ7g) 提取码：01jf
+6. 其他作品体验：[https://pan.baidu.com/s/1ZxG-oyUKe286LPMPxOrO2A](https://pan.baidu.com/s/1ZxG-oyUKe286LPMPxOrO2A) 提取码：o05q
+7. 监控系统在线文档：[https://feiyangqingyun.gitee.io/QWidgetDemo/video_system/](https://feiyangqingyun.gitee.io/QWidgetDemo/video_system/)
+8. 大屏系统在线文档：[https://feiyangqingyun.gitee.io/QWidgetDemo/bigscreen/](https://feiyangqingyun.gitee.io/QWidgetDemo/bigscreen/)
+9. 物联网系统在线文档：[https://feiyangqingyun.gitee.io/QWidgetDemo/iotsystem/](https://feiyangqingyun.gitee.io/QWidgetDemo/iotsystem/)
+
+## 1 开发经验
+### 01：001-010
+1. 当编译发现大量错误的时候，从第一个看起，一个一个的解决，不要急着去看下一个错误，往往后面的错误都是由于前面的错误引起的，第一个解决后很可能都解决了。比如我们可能就写错了一行代码，编译提示几百个错误，你只要把这一行纠正了，其他错误也就没了。
+2. 定时器是个好东西，学会好使用它，有时候用QTimer::singleShot单次定时器和QMetaObject::invokeMethod可以解决意想不到的问题。比如在窗体初始化的时候加载一个耗时的操作，很容易卡主界面的显示，要在加载完以后才会显示界面，这就导致了体验很卡不友好的感觉，此时你可以将耗时的加载（有时候这些加载又必须在主线程，比如用QStackWidget堆栈窗体加载一些子窗体），延时或者异步进行加载，这样就会在界面显示后去执行，而不是卡住主界面。
 ```cpp
 //异步执行load函数
 QMetaObject::invokeMethod(this, "load", Qt::QueuedConnection);
@@ -10,28 +22,36 @@ QTimer::singleShot(10, this, SLOT(load()));
 ```
 
 3. 默认QtCreator是单线程编译，可能设计之初考虑到尽量不过多占用系统资源，而现在的电脑都是多核心的，默认msvc编译器是多线程编译的不需要手动设置，而对于其他编译器，需要手动设置才行。
-- 方法一：在每个项目的构建设置中（可以勾选一个shadow build的页面地方）的build步骤，make arguments增加一行 -j16 即可，此设置会保存在pro.user文件中，一旦删除就需要重新设置，不建议此方法；
+- 方法一：在每个项目的构建设置中（可以勾选一个 shadow build 的页面地方）的build步骤，make arguments增加一行 -j16 即可，此设置会保存在pro.user文件中，一旦删除就需要重新设置，不建议此方法；
 - 方法二：在构建套件的环境中增加，工具->选项->构建套件(kits)->选中一个构建套件->environment->右侧change按钮->打开的输入框中填入 MAKEFLAGS=-j4 ， 这样就可以不用每次设置多线程编译，只要是应用该构件套件的项目都会加上这个编译参数；
 - 注意：-j后面接的是电脑的核心数，写多了不会有效果，要自己看下电脑的参数，或者填个-j4就行，毕竟现在电脑4核心应该是最基本的；
 - 大概从2019年开始的新版本的QtCreator默认已经会根据电脑的核心自动设置多线程编译，比如识别到你的电脑是16核心的就会默认设置-j16参数进行编译；
 
-4. 如果你想顺利用QtCreator部署安卓程序，首先你要在AndroidStudio 里面配置成功，把坑全部趟平。
+4. 如果你想顺利用QtCreator部署安卓程序，首先你要在 Android Studio 里面配置成功，编译一个程序能够在手机上或者模拟器中跑起来，把坑全部趟平。
 
-5. 很多时候找到Qt对应封装的方法后，记得多看看该函数的重载，多个参数的，你会发现不一样的世界，有时候会恍然大悟，原来Qt已经帮我们封装好了，比如QString、QColor的重载参数极其丰富。
+5. 很多时候找到Qt对应封装的方法后，记得多看看该函数的重载，多个参数的，你会发现不一样的世界，有时候会恍然大悟，原来Qt已经帮我们封装好了，比如QString、QColor的重载参数极其丰富，很多你做梦都想要的功能就在里面。
 
-6. 可以在pro文件中写上标记版本号+ico图标（Qt5才支持），其实在windows上就是qmake的时候会自动将此信息转换成rc文件。
+6. 可以在pro文件中写上版本号、程序图标、产品名称、版权所有、文件说明等信息（Qt5才支持），其实在windows上就是qmake的时候会自动将此信息转换成rc文件。对于早期的Qt4版本你可以手动写rc文件实现。
 ```cpp
+#程序版本
 VERSION  = 2025.10.01
+#程序图标
 RC_ICONS = main.ico
+#产品名称
+QMAKE_TARGET_PRODUCT = quc
+#版权所有
+QMAKE_TARGET_COPYRIGHT = feiyangqingyun
+#文件说明
+QMAKE_TARGET_DESCRIPTION = QQ: 517216493  WX: feiyangqingyun
 ```
 
-7. 管理员运行程序，限定在MSVC编译器。
+7. 管理员运行程序，限定在MSVC编译器，在项目pro文件中增加如下代码。
 ```cpp
 QMAKE_LFLAGS += /MANIFESTUAC:"level='requireAdministrator' uiAccess='false'" #以管理员运行
 QMAKE_LFLAGS += /SUBSYSTEM:WINDOWS,"5.01" #VS2013 在XP运行
 ```
 
-8. 运行文件附带调试输出窗口，这个非常有用，很多时候当我们发布程序阶段，我们会遇到程序双击无法运行也不报错提示（开发机器上一切正常），都不知道发生了什么，甚至任务管理器可以看到运行了但是没有界面弹出来，此时就需要在项目的pro文件中加上这个，带界面的程序也会自动弹出调试窗口打印输出信息，方便找问题，一般没法正常运行的程序都会打印一些提示信息缺啥之类的。
+8. 运行文件附带调试输出窗口，这个非常有用，很多时候当我们发布程序阶段，我们会遇到程序双击无法运行也不报错提示（开发机器上一切正常），都不知道发生了什么，甚至任务管理器可以看到运行了但是没有界面弹出来，此时就需要在项目的pro文件中加上一行CONFIG += console，带界面的程序也会自动弹出调试窗口打印输出信息，方便找问题，一般没法正常运行的程序都会打印一些提示信息缺啥之类的。
 ```cpp
 TEMPLATE    = app
 MOC_DIR     = temp/moc
@@ -42,9 +62,9 @@ OBJECTS_DIR = temp/obj
 CONFIG      += console
 ```
 
-9. 绘制平铺背景QPainter::drawTiledPixmap,绘制圆角矩形QPainter::drawRoundedRect(),而不是QPainter::drawRoundRect();
+9. 绘制平铺背景QPainter::drawTiledPixmap，绘制圆角矩形QPainter::drawRoundedRect()，而不是QPainter::drawRoundRect()，这两个函数非常容易搞混。
 
-10. 移除旧的样式
+10. 指定控件移除旧的样式。
 ```cpp
 //移除原有样式
 style()->unpolish(ui->btn);
@@ -54,16 +74,35 @@ ui->btn->setStyleSheet("");
 style()->polish(ui->btn);
 ```
 
-#### 02：011-020
-11. 获取类的属性
+### 02：011-020
+11. 获取类的属性和方法
 ```cpp
-const QMetaObject *metaobject = object->metaObject();
-int count = metaobject->propertyCount();
-for (int i = 0; i < count; ++i) {
-    QMetaProperty metaproperty = metaobject->property(i);
-    const char *name = metaproperty.name();
-    QVariant value = object->property(name);
-    qDebug() << name << value;
+//拿到控件元对象
+const QMetaObject *metaObject = widget->metaObject();
+
+//所有属性的数量
+int propertyCount = metaObject->propertyCount();
+//propertyOffset是自定义的属性开始的位置
+int propertyOffset = metaObject->propertyOffset();
+//循环取出控件的自定义属性, int i = 0 表示所有属性
+for (int i = propertyOffset; i < propertyCount; ++i) {
+    QMetaProperty metaProperty = metaObject->property(i);
+    const char *name = metaProperty.name();
+    const char *type = metaProperty.typeName();
+    QVariant value = widget->property(name);
+    qDebug() << name << type << value;
+}
+
+//所有方法的数量
+int methodCount = metaObject->methodCount();
+//methodOffset是自定义的方法开始的位置
+int methodOffset = metaObject->methodOffset();
+//循环取出控件的自定义方法, int i = 0 表示所有方法
+for (int i = methodOffset; i < methodCount; ++i) {
+    QMetaMethod metaMethod = metaObject->method(i);
+    const char *name = metaMethod.name();
+    const char *type = metaMethod.typeName();
+    qDebug() << name << type;
 }
 ```
 
@@ -130,16 +169,34 @@ timer->inherits("QAbstractButton"); // returns false
 
 20. 在开发时, 无论是出于维护的便捷性, 还是节省内存资源的考虑, 都应该有一个 qss 文件来存放所有的样式表, 而不应该将 setStyleSheet 写的到处都是。如果是初学阶段或者测试阶段可以直接UI上右键设置样式表，正式项目还是建议统一到一个qss样式表文件比较好，统一管理。
 
-#### 03：021-030
+### 03：021-030
 21. 如果出现Z-order assignment: is not a valid widget.错误提示，用记事本打开对应的ui文件，找到<zorder></zorder>为空的地方，删除即可。
 
-22. 善于利用QComboBox的addItem的第二个参数设置用户数据，可以实现很多效果，使用itemData取出来。
+22. 善于利用QComboBox的addItem的第二个参数设置用户数据，可以实现很多效果，使用itemData取出来。特别注意的是第二个参数是QVariant类型，这就不要太灵活了，意味着可以附带万能的数据比如结构体，这样就可以带一堆数据了，而不是一个数据。比如下拉框选择学号，对应元素可以附带该学生的姓名、班级、成绩等。很多人以为只能附带QString、int之类的数据，因为通常的用法也是那两种。
+```cpp
+QStringList listVideoOpenInterval, listVideoOpenIntervalx;
+listVideoOpenInterval << "0.0 秒" << "0.1 秒" << "0.3 秒" << "0.5 秒" << "1.0 秒" << "2.0 秒";
+listVideoOpenIntervalx << "0" << "100" << "300" << "500" << "1000" << "2000";
+for (int i = 0; i < listVideoOpenInterval.count(); ++i) {
+    ui->cboxVideoOpenInterval->addItem(listVideoOpenInterval.at(i), listVideoOpenIntervalx.at(i));
+}
+//取出对应的值
+int indexVideoOpenInterval = ui->cboxVideoOpenInterval->currentIndex();
+indexVideoOpenInterval = ui->cboxVideoOpenInterval->itemData(indexVideoOpenInterval).toInt();
+```
 
-23. 如果用了webengine模块，发布程序的时候带上QtWebEngineProcess.exe+translations文件夹+resources文件夹。
+23. 如果用了webengine模块，发布程序的时候带上QtWebEngineProcess.exe、translations文件夹、resources文件夹，不然无法正常运行。
 
-24. 默认Qt是一个窗体一个句柄，如果要让每个控件都拥有独立的句柄，设置下 a.setAttribute(Qt::AA_NativeWindows);
+24. 在MFC程序或者VB/C#等窗体程序中，每个控件都有一个句柄，而且用句柄工具移过去会自动识别，但是在Qt程序中默认Qt是一个窗体一个句柄，如果要让每个控件都拥有独立的句柄，在main函数中要做如下设置。
+```cpp
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    a.setAttribute(Qt::AA_NativeWindows);
+}
+```
 
-25. Qt+Android防止程序被关闭。
+25. Qt编写的Android程序防止程序被关闭。
 ```cpp
 #if defined(Q_OS_ANDROID)
 QAndroidService a(argc, argv);
@@ -162,7 +219,7 @@ return a.exec();
 ```cpp
 QMainWindow > .QWidget {
     background-color: gainsboro;
-    background-image: url(:/images/pagefold.png);
+    background-image: url(:/images/xxoo.png);
     background-position: top right;
     background-repeat: no-repeat
 }
@@ -173,16 +230,17 @@ QMainWindow > .QWidget {
 //Qt4写法
 ./HelloQt -qws &
 
-//Qt5写法 xcb 可以改成 eglfs vnc wayland 等,有哪个就用哪个挨个测试
+//Qt5写法 xcb 可以改成 linuxfb eglfs vnc wayland 等,有哪个就用哪个挨个测试
 ./HelloQt --platform xcb
+./HelloQt --platform linuxfb
 ./HelloQt --platform wayland
 ```
 
-29. Qtcreator软件的配置文件存放在：C:\Users\Administrator\AppData\Roaming\QtProject，有时候如果发现出问题了，将这个文件夹删除后打开creator自动重新生成即可。
+29. 如果发现QtCreator中的构建套件不正常了或者坏了（比如不能正确识别环境中的qmake或者编译器、打开项目不能正常生成影子构建目录），请找到两个目录（C:\Users\Administrator\AppData\Local\QtProject、C:\Users\Administrator\AppData\Roaming\QtProject）删除即可，删除后重新打开QtCreator进行构建套件的配置就行。
 
-30. QMediaPlayer是个壳（也可以叫框架），依赖本地解码器，视频这块默认基本上就播放个MP4甚至连MP4都不能播放，如果要支持其他格式需要下载k-lite或者LAV Filters安装即可（k-lite或者LAV Filters是指windows上的，其他系统上自行搜索，貌似嵌入式linux上依赖GStreamer，并未完整验证）。如果需要做功能强劲的播放器，初学者建议用vlc、mpv，终极万能大法用ffmpeg（解码出来的视频可以用QOpenGLWidget走GPU绘制或者转成QImage绘制，音频数据可以用QAudioOutput播放）。
+30. QMediaPlayer是个壳（也可以叫框架），依赖本地解码器，视频这块默认基本上就播放个MP4甚至连MP4都不能播放，如果要支持其他格式需要下载k-lite或者LAV Filters安装即可（k-lite或者LAV Filters是指windows上的，其他系统上自行搜索，貌似嵌入式linux上依赖GStreamer，并未完整验证，报错提示 Your GStreamer installation is missing a plug-in，需要命令安装 sudo apt-get install ubuntu-restricted-extras）。如果需要做功能强劲的播放器，初学者建议用vlc、mpv，终极万能大法用ffmpeg（解码出来的视频可以用QOpenGLWidget走GPU绘制或者转成QImage绘制，音频数据可以用QAudioOutput播放）。
 
-#### 04：031-040
+### 04：031-040
 31. 判断编译器类型、编译器版本、操作系统。
 ```cpp
 //GCC编译器
@@ -201,6 +259,39 @@ QMainWindow > .QWidget {
 #if _MSC_VER >=1700 // VC2012  以上
 #if _MSC_VER >=1800 // VC2013  以上
 #if _MSC_VER >=1900 // VC2015  以上
+
+//Visual Studio版本与MSVC版本号的对应关系
+MSC    1.0   _MSC_VER == 100
+MSC    2.0   _MSC_VER == 200
+MSC    3.0   _MSC_VER == 300
+MSC    4.0   _MSC_VER == 400
+MSC    5.0   _MSC_VER == 500
+MSC    6.0   _MSC_VER == 600
+MSC    7.0   _MSC_VER == 700
+MSVC++ 1.0   _MSC_VER == 800
+MSVC++ 2.0   _MSC_VER == 900
+MSVC++ 4.0   _MSC_VER == 1000 (Developer Studio 4.0)
+MSVC++ 4.2   _MSC_VER == 1020 (Developer Studio 4.2)
+MSVC++ 5.0   _MSC_VER == 1100 (Visual Studio 97 version 5.0)
+MSVC++ 6.0   _MSC_VER == 1200 (Visual Studio 6.0 version 6.0)
+MSVC++ 7.0   _MSC_VER == 1300 (Visual Studio .NET 2002 version 7.0)
+MSVC++ 7.1   _MSC_VER == 1310 (Visual Studio .NET 2003 version 7.1)
+MSVC++ 8.0   _MSC_VER == 1400 (Visual Studio 2005 version 8.0)
+MSVC++ 9.0   _MSC_VER == 1500 (Visual Studio 2008 version 9.0)
+MSVC++ 10.0  _MSC_VER == 1600 (Visual Studio 2010 version 10.0)
+MSVC++ 11.0  _MSC_VER == 1700 (Visual Studio 2012 version 11.0)
+MSVC++ 12.0  _MSC_VER == 1800 (Visual Studio 2013 version 12.0)
+MSVC++ 14.0  _MSC_VER == 1900 (Visual Studio 2015 version 14.0)
+MSVC++ 14.1  _MSC_VER == 1910 (Visual Studio 2017 version 15.0)
+MSVC++ 14.11 _MSC_VER == 1911 (Visual Studio 2017 version 15.3)
+MSVC++ 14.12 _MSC_VER == 1912 (Visual Studio 2017 version 15.5)
+MSVC++ 14.13 _MSC_VER == 1913 (Visual Studio 2017 version 15.6)
+MSVC++ 14.14 _MSC_VER == 1914 (Visual Studio 2017 version 15.7)
+MSVC++ 14.15 _MSC_VER == 1915 (Visual Studio 2017 version 15.8)
+MSVC++ 14.16 _MSC_VER == 1916 (Visual Studio 2017 version 15.9)
+MSVC++ 14.2  _MSC_VER == 1920 (Visual Studio 2019 Version 16.0)
+MSVC++ 14.21 _MSC_VER == 1921 (Visual Studio 2019 Version 16.1)
+MSVC++ 14.22 _MSC_VER == 1922 (Visual Studio 2019 Version 16.2)
 
 //Borland C++
 #ifdef __BORLANDC__
@@ -230,7 +321,6 @@ QMainWindow > .QWidget {
 #if (_WIN32_WINNT >= 0x0500) // Windows 2000以上
 #if (_WIN32_WINNT >= 0x0501) // Windows XP以上
 #if (_WIN32_WINNT >= 0x0600) // Windows Vista以上
-
 ```
 
 32. 在pro中判断Qt版本及构建套件位数
@@ -268,6 +358,14 @@ lessThan(QT_MINOR_VERSION, 8) {
 #这里放要做的处理
 }}
 
+#下面的含义是如果版本 < 5.12.0
+REQ_QT_MAJOR = 5
+REQ_QT_MINOR = 12
+REQ_QT_PATCH = 0
+lessThan(QT_MAJOR_VERSION, $$REQ_QT_MAJOR)|lessThan(QT_MINOR_VERSION, $$REQ_QT_MINOR)|lessThan(QT_MINOR_VERSION, $$REQ_QT_PATCH) {
+#这里放要做的处理
+}
+
 #下面的含义是如果版本 >= 5.5
 greaterThan(QT_MAJOR_VERSION, 4) {
 greaterThan(QT_MINOR_VERSION, 4) {
@@ -278,9 +376,19 @@ greaterThan(QT_MINOR_VERSION, 4) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6,0,0))
 //这里放要做的处理
 #endif
+
+//下面表示 >= 5.0.0
+#if QT_VERSION >= 0x050000
+...
+#endif
+
+//下面表示 < 5.12.10
+#if QT_VERSION < 0x050C0A
+...
+#endif
 ```
 
-33. Qt最小化后恢复界面假死冻结，加上代码
+33. Qt最小化后恢复界面可能会出现假死冻结现象，加上代码
 ```cpp
 void showEvent(QShowEvent *e)
 {
@@ -289,11 +397,11 @@ void showEvent(QShowEvent *e)
 }
 ```
 
-34. 获取标题栏高度：style()->pixelMetric(QStyle::PM_TitleBarHeight); PM_TitleBarHeight点进去你会发现新大陆。
+34. 获取标题栏高度：style()->pixelMetric(QStyle::PM_TitleBarHeight); PM_TitleBarHeight点进去你会发现新大陆，有一堆玩意在里面。
 
 35. 设置高分屏属性以便支持2K4K等高分辨率，尤其是手机app。必须写在main函数的QApplication a(argc, argv);的前面。
 ```cpp
-#if (QT_VERSION > QT_VERSION_CHECK(5,6,0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5,6,0))
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
     QApplication a(argc, argv);
@@ -325,7 +433,7 @@ QScroller::grabGesture(ui->listWidget, QScroller::LeftMouseButtonGesture);
 //还有个QScrollerProperties可以设置滚动的一些参数
 ```
 
-#### 05：041-050
+### 05：041-050
 41. 如果使用sqlite数据库不想产生数据库文件，可以创建内存数据库。
 ```cpp
 QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
@@ -334,7 +442,7 @@ db.setDatabaseName(":memory:");
 
 42. 清空数据表并重置自增ID，sql = truncate table table_name。
 
-43. Qtchart模块从Qt5.7开始自带，最低编译要求Qt5.4。在安装的时候记得勾选，默认不勾选。使用该模块需要引入命名空间。
+43. QtChart模块从Qt5.7开始自带，最低编译要求Qt5.4。在安装的时候记得勾选，默认不勾选。使用该模块需要引入命名空间。
 ```cpp
 #include <QChartView>
 QT_CHARTS_USE_NAMESPACE
@@ -360,7 +468,7 @@ connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
 loop.exec();
 ```
 
-47. 多种预定义变量 #if (defined webkit) || (defined webengine)，去掉生成空的debug和release目录 CONFIG -= debug_and_release。
+47. 多种预定义变量 #if (defined webkit) || (defined webengine)，去掉生成空的debug和release目录，在pro文件中加一行 CONFIG -= debug_and_release。
 
 48. 新版的Qtcreator增强了语法检查，会弹出很多警告提示等，可以在插件列表中关闭clang打头的几个即可，Help》About Plugins。也可以设置代码检查级别，Tools》Options 》C++ 》Code Model。
 
@@ -373,9 +481,9 @@ while(model->canFetchMore()) {
 }
 ```
 
-50. 如果需要指定无边框窗体，但是又需要保留操作系统的边框特性，可以自由拉伸边框，可以使用 setWindowFlags(Qt::CustomizeWindowHint);
+50. 如果需要指定无边框窗体，但是又需要保留操作系统的边框特性，比如自由拉伸边框，可以使用 setWindowFlags(Qt::CustomizeWindowHint)，这样会保留一个系统白边框。
 
-#### 06：051-060
+### 06：051-060
 51. 在某些http post数据的时候，如果采用的是&字符串连接的数据发送，中文解析乱码的话，需要将中文进行URL转码。
 ```cpp
 QString content = "测试中文";
@@ -418,13 +526,13 @@ setsockopt(fd, SOL_TCP, TCP_KEEPCNT, (void *)&keepCount, sizeof(keepCount));
 
 57. 如果程序打包好以后弹出提示 This application failed to start because it could not find or load the Qt platform plugin 一般都是因为platforms插件目录未打包或者打包错了的原因导致的。
 
-58. 非常不建议tr中包含中文，尽管现在的新版Qt支持中文到其他语言的翻译，但是很不规范，也不知道TMD是谁教的，tr的本意是包含英文，然后翻译到其他语言比如中文，现在大量的初学者滥用tr，如果没有翻译的需求，禁用tr，tr需要开销的，Qt默认会认为他需要翻译，会额外进行特殊处理。
+58. 非常不建议tr中包含中文，尽管现在的新版Qt支持中文到其他语言的翻译，但是很不规范，也不知道TMD是谁教的（后面发现我在刚学Qt的时候也发布了一些demo到网上也是tr包含中文的，当时就狠狠的打了自己一巴掌），tr的本意是包含英文，然后翻译到其他语言比如中文，现在大量的初学者滥用tr，如果没有翻译的需求，禁用tr，tr需要开销的，Qt默认会认为他需要翻译，会额外进行特殊处理。
 
 59. 很多人Qt和Qt Creator傻傻分不清楚，经常问Qt什么版本结果发一个Qt Creator的版本过来，Qt Creator是使用Qt编写的集成开发环境IDE，和宇宙第一的Visual Studio一样，他可以是msvc编译器的（WIN对应的Qt集成安装环境中自带的Qt Cerator是msvc的），也可以是mingw编译的，还可以是gcc的。如果是自定义控件插件，需要集成到Qt Creator中，必须保证该插件的动态库文件（dll或者so等文件）对应的编译器和Qt版本以及位数和Qt Creator的版本完全一致才行，否则基本不大可能集成进去。特别注意的是Qt集成环境安装包中的Qt版本和Qt Creator版本未必完全一致，必须擦亮眼睛看清楚，有些是完全一致的。
 
 60. 超过两处相同处理的代码，建议单独写成函数。代码尽量规范精简，比如 if(a == 123) 要写成 if (123 == a)，值在前面，再比如 if (ok == true) 要写成 if (ok)，if (ok == false) 要写成 if (!ok)等。
 
-#### 07：061-070
+### 07：061-070
 61. 很多人问Qt嵌入式平台用哪个好，这里统一回答（当前时间节点2018年）：imx6+335x比较稳定，性能高就用RK3288 RK3399，便宜的话就用全志H3，玩一玩可以用树莓派香橙派。
 
 62. 对于大段的注释代码，建议用 #if 0 #endif 将代码块包含起来，而不是将该段代码选中然后全部双斜杠注释，下次要打开这段代码的话，又需要重新选中一次取消，如果采用的是 #if 0则只要把0改成1即可，开发效率提升很多。
@@ -463,7 +571,7 @@ datetime.fromMSecsSinceEpoch(1315193829218).toString("yyyy-MM-dd hh:mm:ss:zzz");
 datetime.fromTime_t(1315193829).toString("yyyy-MM-dd hh:mm:ss[:zzz]");
 ```
 
-#### 08：071-080
+### 08：071-080
 71. 在我们使用QList、QStringList、QByteArray等链表或者数组的过程中，如果只需要取值，而不是赋值，强烈建议使用 at() 取值而不是 [] 操作符，在官方书籍《C++ GUI Qt 4编程（第二版）》的书中有特别的强调说明，此教材的原作者据说是Qt开发的核心人员编写的，所以还是比较权威，至于使用 at() 与使用 [] 操作符速度效率的比较，网上也有网友做过此类对比。原文在书的212页，这样描述的：Qt对所有的容器和许多其他类都使用隐含共享，隐含共享是Qt对不希望修改的数据决不进行复制的保证，为了使隐含共享的作用发挥得最好，可以采用两个新的编程习惯。第一种习惯是对于一个（非常量的）向量或者列表进行只读存取时，使用 at() 函数而不用 [] 操作符，因为Qt的容器类不能辨别 [] 操作符是否将出现在一个赋值的左边还是右边，他假设最坏的情况出现并且强制执行深层赋值，而 at() 函数则不被允许出现在一个赋值的左边。
 
 72. 如果是dialog窗体，需要在exec以后还能让其他代码继续执行，请在dialog窗体exec前增加一行代码，否则会阻塞窗体消息。
@@ -502,18 +610,20 @@ double gray = (0.299 * color.red() + 0.587 * color.green() + 0.114 * color.blue(
 QColor textColor = gray > 0.5 ? Qt::black : Qt::white;
 ```
 
-79. 对QTableView或者QTableWidget禁用列拖动。
+79. 对QTableView、QTableWidget、QTreeView、QTreeWidget禁用列拖动。
 ```cpp
-#if (QT_VERSION <= QT_VERSION_CHECK(5,0,0))
+#if (QT_VERSION < QT_VERSION_CHECK(5,0,0))
     ui->tableView->horizontalHeader()->setResizeMode(0, QHeaderView::Fixed);
+    ui->treeView->header()->setResizeMode(0, QHeaderView::Fixed);
 #else
     ui->tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
+    ui->treeView->header()->setSectionResizeMode(0, QHeaderView::Fixed);
 #endif
 ```
 
 80. 从Qt4转到Qt5，有些类的方法已经废弃或者过时了，如果想要在Qt5中启用Qt4的方法，比如QHeadVew的setMovable，可以在你的pro或者pri文件中加上一行即可：DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0
 
-#### 09：081-090
+### 09：081-090
 81. Qt中的QColor对颜色封装的很完美，支持各种转换，比如rgb、hsb、cmy、hsl，对应的是toRgb、toHsv、toCmyk、toHsl，还支持透明度设置，颜色值还能转成16进制格式显示。
 ```cpp
 QColor color(255, 0, 0, 100);
@@ -573,7 +683,7 @@ writer->close();
 
 90. 在构造函数中获取控件的宽高很可能是不正确的，需要在控件首次显示以后再获取才是正确的，控件是在首次显示以后才会设置好正确的宽高值，记住是在首次显示以后，而不是构造函数或者程序启动好以后，如果程序启动好以后有些容器控件比如QTabWidget中的没有显示的页面的控件，你去获取宽高很可能也是不正确的，万无一失的办法就是首次显示以后去获取。
 
-#### 10：091-100
+### 10：091-100
 91. 数据库处理一般建议在主线程，如果非要在其他线程，务必记得打开数据库也要在那个线程，即在那个线程使用数据库就在那个线程打开，不能打开数据库在主线程，执行sql在子线程，很可能出问题。
 
 92. 新版的QTcpServer类在64位版本的Qt下很可能不会进入incomingConnection函数，那是因为Qt5对应的incomingConnection函数参数变了，由之前的int改成了qintptr，改成qintptr有个好处，在32位上自动是quint32而在64位上自动是quint64，如果在Qt5中继续写的参数是int则在32位上没有问题在64位上才有问题，所以为了兼容Qt4和Qt5，必须按照不一样的参数写。
@@ -685,8 +795,8 @@ while (it.hasNext()) {
 
 100. setPixmap是最糟糕的贴图方式，一般只用来简单的不是很频繁的贴图，频繁的建议painter绘制，默认双缓冲，在高级点用opengl绘制，利用GPU。
 
-#### 11：101-110
-101. 如果需要在尺寸改变的时候不重绘窗体，则设置属性即可 this->setAttribute(Qt::WA_StaticContents, true); 这样可以避免可以避免对已经显示区域的重新绘制。
+### 11：101-110
+101. 如果需要在尺寸改变的时候不重绘窗体，则设置属性即可 this->setAttribute(Qt::WA_StaticContents, true); 这样可以避免对已经显示区域的重新绘制。
 
 102. 默认程序中获取焦点以后会有虚边框，如果看着觉得碍眼不舒服可以去掉，设置样式即可：setStyleSheet("*{outline:0px;}");
 
@@ -790,7 +900,7 @@ w->activateWindow();
 
 110. QGraphicsEffect类的相关效果很炫，可以实现很多效果比如透明、渐变、阴影等，但是该类很耗CPU，如果不是特别需要一般不建议用，就算用也是要用在该部件后期不会发生频繁绘制的场景，不然会让你哭晕在厕所。
 
-#### 12：111-120
+### 12：111-120
 111. 在不同的平台上文件路径的斜杠也是不一样的，比如linux系统一般都是 / 斜杠，而在windows上都是 \\ 两个反斜杠，Qt本身程序内部无论在win还是linux都支持 / 斜杠的路径，但是一些第三方库的话可能需要转换成对应系统的路径，这就需要用到斜杠转换，Qt当然内置类方法。
 ```cpp
 QString path = "C:/temp/test.txt";
@@ -886,7 +996,7 @@ qDebug()<< s1;
 
 120. 用QSettings设置注册表，如果不是管理员身份运行会打印 QSettings: failed to set subkey "xxx" (拒绝访问。)，你需要手动鼠标右键管理员身份运行就可以。
 
-#### 13：121-130
+### 13：121-130
 121. QLineEdit除了单纯的文本框以外，还可以做很多特殊的处理用途。
 - 限制输入只能输入IP地址。
 - 限制输入范围，强烈推荐使用 QRegExpValidator 正则表达式来处理。
@@ -1063,7 +1173,7 @@ QMAKE_PRE_LINK += copy /Y $$srcFile1 $$dstDir && copy /Y $$srcFile2 $$dstDir
 QMAKE_POST_LINK += copy /Y $$srcFile1 $$dstDir && copy /Y $$srcFile2 $$dstDir
 ```
 
-#### 14：131-140
+### 14：131-140
 131. Qt新版本往往会带来一些头文件的更新，比如以前使用QPainter绘制，不需要额外包含QPainterPath头文件，而5.15版本开始就需要显示主动引入#include "qpainterpath.h"才行。
 
 132. Qt6.0发布了，是个比较大的改动版本，很多基础的类或者组件都放到单独的源码包中，需要自行官网下载并编译，默认不提供集成在开发目录下，需要手动编译并集成，比如QRegExp，QTextCodec类，需要编译集成后pro文件 QT += core5compat 才能用， 具体说明在https://doc.qt.io/qt-6/qtcore5-index.html。
@@ -1173,6 +1283,8 @@ struct FunctionInfo {
 //方法2：在可执行文件同目录下新建文件 qt.conf 填入下面内容
 [Platforms]
 WindowsArguments = dpiawareness=0
+//下面这行用来解决Qt高DPI下文字显示有锯齿的问题
+WindowsArguments = fontengine=freetype
 
 //方法3：在main函数最前面设置Qt内部的环境变量
 qputenv("QT_AUTO_SCREEN_SCALE_FACTOR", "1.5");
@@ -1180,6 +1292,15 @@ qputenv("QT_AUTO_SCREEN_SCALE_FACTOR", "1.5");
 //方法4：新版本的Qt比如Qt5.14修正了对高分屏的处理支持不是整数的缩放
 qputenv("QT_ENABLE_HIGHDPI_SCALING", "1");
 QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+
+//禁用缩放
+//测试发现AA_Use96Dpi属性在Qt5.9以上版本完全正常，以下版本比如5.7有部分控件在175%缩放不正常比如QTextEdit，需要外层套个widget才行。
+#if (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
+    QApplication::setAttribute(Qt::AA_Use96Dpi);
+#endif
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Floor);
+#endif
 ```
 
 139. QTabWidget选项卡有个自动生成按钮切换选项卡的机制，有时候不想看到这个烦人的切换按钮，可以设置usesScrollButtons为假，其实QTabWidget的usesScrollButtons属性最终是应用到QTabWidget的QTabBar对象上，所以只要设置全局的QTabBar的这个属性关闭即可。为啥要设置全局的呢，因为如果只是对QTabWidget设置了该属性，而在QMainWindow窗体中QDockWidget合并自动形成的选项卡只有QTabBar对象导致依然是有切换按钮。
@@ -1204,7 +1325,7 @@ QTabBar{qproperty-tabsClosable:true;}
 QMainWindow::separator{width:1px;height:1px;margin:1px;padding:1px;background:#FF0000;}
 ```
 
-#### 15：141-150
+### 15：141-150
 141. QImage支持xpm图标，查看Qt内置的QStyle风格的代码中可以发现大量的xpm图标定义，通过代码的形式来产生图标，哇咔咔好牛逼。
 ```cpp
 static const char * const imgData[] = {
@@ -1431,7 +1552,7 @@ void MainWindow::test_slot()
 - 斗王：放在文件容易被篡改，集成到可执行文件不够灵活，一旦样式表更新需要重新编译文件，如何做到既能只更新样式表文件，又不需要重新编译可执行文件，又能防止被篡改：采用rcc命令将资源文件编译生成二进制，只需要替换该二进制文件即可；
 - 斗皇：继承qstyle类自己实现完成所有样式接口，统一整体风格，大名鼎鼎的UOS系统默认规则就是如此，不允许用样式表，全部painter绘制；
 
-#### 16：151-160
+### 16：151-160
 151. 当Qt中编译资源文件太大时，效率很低，或者需要修改资源文件中的文件比如图片、样式表等，需要重新编译可执行文件，这样很不友好，当然Qt都给我们考虑好了策略，此时可以将资源文件转化为二进制的rcc文件，这样就将资源文件单独出来了，可在需要的时候动态加载。
 ```cpp
 //Qt中使用二进制资源文件方法如下
@@ -1494,6 +1615,10 @@ image.save("2.png");
 - 其他数据库还要注意版本的区别，ODBC数据源形式还容易出错和执行失败；
 - sqlite数据库也有几个重大缺点：不支持加密，不支持网络访问，不支持部分数据库高级特性，不支持海量数据（亿级别以上），但是对于绝大部分Qt项目还是足够；
 - 数据库支持友好度大致是 sqlite > postgresql > mysql > odbc ;
+- 如果采用的odbc数据源模式连接数据库，只需要设置数据库名称为对应新建的数据源名字，然后设置用户名和密码就行，不需要设置主机名称和端口，因为数据源那边已经设置过的，这里只需要再次验证用户信息就行。
+- ODBC数据源分32/64位之分，在数据源管理器中，如果添加的数据源对应平台显示的只有32或者只有64位，那你的Qt程序也只能是对应位数的才能连接成功。如果显示的是64位，你用32位的程序去连接会失败。
+- 32位的Qt程序，带对应32位的libmysql动态库，可以访问32/64位的mysql数据库，64位的也是一样可以访问32/64位的mysql数据库，只需要带上对应位数的动态库就行。查看mysql是32位还是64位命令 mysql.exe -V。
+- 在mysql驱动可用且正常的情况下，如果还是提示Driver not loaded Driver not loaded，则很可能是拷贝的libmysql动态库版本不对或者位数不对导致的。
 - 以上都是在Qt环境中个人测试得出的结论，结果未必正确，作为参考即可，其他编程环境比如C#、JAVA请忽略，也许差别可能在中间通信的效率造成的；
 
 155. Qt5.10以后提供了新的类 QRandomGenerator QRandomGenerator64 管理随机数，使用更方便，尤其是取某个区间的随机数。
@@ -1596,7 +1721,7 @@ QString("QTabBar{qproperty-usesScrollButtons:false;qproperty-documentMode:true;q
 //5.9以后貌似修复了这个BUG，按照理想中的拉伸填充等分设置tab的宽度。
 ```
 
-#### 17：161-170
+### 17：161-170
 161. 经常有人说Qt垃圾，说用Qt在1毫秒绘制几千个数据点卡成屎。其实显示器最高刷新频率一般才60帧，1毫秒就绘制一次有意义吗？不仅显示器没刷新过来，人肉眼也看不过来（有人可能又要抬杠说这是老板要求的，显示归显示，至于人看不看那是另外一回事，我想说的是显示不就是给人看的吗？给程序看可以直接后台绘制图片让程序识别啊没必要显示的），程序中要做的应该是尽量降低程序的绘制刷新频率到显示器的频率（其实一秒钟30帧都足够），一次搞多一点的数据一次性绘制（数据量很大还可以考虑重采样，比如平均值法等，毕竟要考虑显示器的分辨率就那么大，搞个几十万的数据点挤一块没啥意思，可以将一整块区域内的数据点换成一个点），而不是绘制多次，尽管两种办法都可以将收到的数据绘制完成，但是效率相差的不是一点点，信号也是如此，不建议太频繁的发送信号，Qt内部1秒钟处理信号的个数也是有限制的，太频繁高并发的信号，很可能会丢失或者合并一部分，比如网络请求接收到的学生信息表，应该是在该应答数据内的所有学生信息解析完一次性发送，而不是解析一条发送一条。
 
 162. Qt提供了N种窗体属性比如无边框属性FramelessWindowHint、不在任务栏显示属性Tool等，有时候我们需要对窗口的属性进行动态设置，比如增加一个属性或者移除一个属性，Qt5.9以前需要拿到原有的窗体属性做运算，后面可以用新的方法。
@@ -1650,7 +1775,13 @@ QApplication app(argc, argv);
 165. Qt对区分不同的编译器也做了非常细致的处理。
 ```cpp
 #pro文件可以这样判断
-msvc{}
+msvc {
+//要做的处理
+}
+
+mingw {
+//要做的处理
+}
 
 //代码中可以这样判断
 #ifdef Q_CC_MINGW
@@ -1740,7 +1871,7 @@ socket->setLocalPort(6005);
 - tcp对网卡1监听了端口6000，在网卡1上其他tcp只能监听6000以外的端口。
 - udp协议也是上面的逻辑。
 
-170. 开源的图表控件QCustomPlot很经典，在曲线数据展示这块性能彪悍，总结了一些容易忽略的经验要点。
+170. 开源的图表控件QCustomPlot很经典，作者至少是八星斗圣级别，在曲线数据展示这块性能彪悍，总结了一些容易忽略的经验要点。
 - 可以将XY轴对调，然后形成横向的效果，无论是曲线图还是柱状图，分组图、堆积图等，都支持这个特性。
 - 不需要的提示图例可以调用 legend->removeItem 进行移除。
 - 两条曲线可以调用 setChannelFillGraph 设置合并为一个面积区域。
@@ -1748,6 +1879,8 @@ socket->setLocalPort(6005);
 - 可以设置不同的线条样式（setLineStyle）、数据样式（setScatterStyle）。
 - 坐标轴的箭头样式可更换 setUpperEnding。
 - 可以用 QCPBarsGroup 实现柱状分组图，这个类在官方demo中没有，所以非常容易忽略。
+- V2.0开始支持数据排序设置，默认是交给QCustomPlot排序，也可以设置setData第三个参数为true表示已经排序过，这样可以绘制往回走的曲线。
+- 频繁绘制数据可以设置排队绘制参数 replot(QCustomPlot::rpQueuedReplot)，可以避免重复的replot和提高性能。如果不开启很可能绘制出错。
 
 ```cpp
 //对调XY轴，在最前面设置
@@ -1763,8 +1896,12 @@ customPlot->legend->removeItem(1);
 customPlot->graph(0)->setChannelFillGraph(customPlot->graph(1));
 
 //关闭抗锯齿以及设置拖动的时候不启用抗锯齿
-customPlot->graph()->setAntialiased(false);
 customPlot->setNoAntialiasingOnDrag(true);
+customPlot->graph()->setAntialiased(false);
+customPlot->graph()->setAntialiasedFill(false);
+customPlot->graph()->setAntialiasedScatters(false);
+//设置快速绘制可以大大加快画笔宽度大于1的线条
+customPlot->setPlottingHint(QCP::phFastPolylines);
 
 //多种设置数据的方法
 customPlot->graph(0)->setData();
@@ -1809,9 +1946,27 @@ foreach (QCPBars *bar, bars) {
 }
 //设置分组之间的间隔
 group->setSpacing(2);
+
+//绘制往回走的曲线
+QVector<double> keys, values;
+keys << 0 << 1 << 2 << 3 << 4 << 5 << 4 << 3;
+values << 5 << 4 << 6 << 7 << 7 << 6 << 5 << 4;
+customPlot->graph(0)->setData(keys, values, true);
+
+//频繁绘制数据开启排队绘制可以提高性能
+customPlot->replot(QCustomPlot::rpQueuedReplot);
+
+QCPAxis *axis = customPlot->xAxis;
+double lower = axis->range().lower;
+double upper = axis->range().upper;
+double origin = (upper - lower) / 2;
+//设置刻度线按照设置优先而不是可读性优先
+axis->ticker()->setTickStepStrategy(QCPAxisTicker::tssMeetTickCount);
+//设置原点值为范围值的中心点
+axis->ticker()->setTickOrigin(origin);
 ```
 
-#### 18：171-180
+### 18：171-180
 171. 在Qt编程中经常会遇到编码的问题，由于跨平台的考虑兼容各种系统，而windows系统默认是gbk或者gb2312编码，当然后期可能msvc编译器都支持utf8编码，所以在部分程序中传入中文目录文件名称的时候会发现失败，因为可能对应的接口用了早期的fopen函数而不是fopen_s函数，比如fmod中也是这个情况。这个时候就需要转码处理。
 ```cpp
 QString fileName = "c:/测试目录/1.txt";
@@ -1912,8 +2067,10 @@ int main(int argc, char *argv[])
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
 #if (QT_VERSION > QT_VERSION_CHECK(5,4,0))
-    //设置opengl模式 AA_UseDesktopOpenGL(默认) AA_UseSoftwareOpenGL AA_UseOpenGLES
-    //QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
+    //设置opengl模式 AA_UseDesktopOpenGL(默认) AA_UseOpenGLES AA_UseSoftwareOpenGL
+    //在一些很旧的设备上或者对opengl支持很低的设备上需要使用AA_UseOpenGLES表示禁用硬件加速
+    //如果开启的是AA_UseOpenGLES则无法使用硬件加速比如ffmpeg的dxva2
+    //QApplication::setAttribute(Qt::AA_UseOpenGLES);
     //设置opengl共享上下文
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 #endif
@@ -2098,28 +2255,29 @@ model->submitAll();
 model->revertAll();
 ```
 
-#### 19：181-190
+### 19：181-190
 181. Qt天生就是linux的，从linux开始发展起来的，所以不少Qt程序员经常的开发环境是linux，比如常用的ubuntu等系统，整理了一点常用的linux命令。
 
-| 命令 | 功能 |
-| :------ | :------ |
-| sudo -s | 切换到管理员，如果是 sudo -i 切换后会改变当前目录。 |
-| apt install g++ | 安装软件包（要管理员权限），另一个派系的是 yum install |
-| cd /home | 进入home目录 |
-| ls | 罗列当前所在目录所有目录和文件 |
-| ifconfig | 查看网卡信息包括IP地址，windows上是 ipconfig。 |
-| tar -zxvf bin.tar.gz | 解压文件到当前目录 |
-| tar -jxvf bin.tar.xz | 解压文件到当前目录 |
-| tar -zxvf bin.tar.gz -C /home | 解压文件到/home目录，记住是大写的C。 |
-| tar -zcvf bin.tar.gz bin | 将bin目录压缩成tar.gz格式文件（压缩比一般） |
-| tar -jcvf bin.tar.xz bin | 将bin目录压缩成tar.xz格式文件（压缩比高，推荐） |
-| tar -... | j z 表示不同的压缩方法，x表示解压，c表示压缩。 |
-| gedit 1.txt | 用记事本打开文本文件 |
-| vim 1.txt | 用vim打开文件，很多时候可以缩写用vi。 |
-| ./configure  make -j4  make install | 通用编译源码命令， 第一步./configure执行配置脚本，第二步make -j4启用多线程编译，第三步make install安装编译好的文件。|
-| ./configure -prefix /home/liu/Qt-5.9.3-static -static -sql-sqlite -qt-zlib -qt-xcb -qt-libpng -qt-libjpeg -fontconfig -system-freetype -iconv -nomake tests -nomake examples -skip qt3d -skip qtdoc | Qt通用编译命令 |
-| ./configure -prefix /home/liu/Qt-5.9.3-static -static -release -nomake examples -nomake tests -skip qt3d |  精简编译命令 |
-| ./configure --prefix=host --enable-static --disable-shared --disable-doc | ffmpeg编译命令 |
+|命令|功能|
+|:------|:------|
+|sudo -s|切换到管理员，如果是 sudo -i 切换后会改变当前目录。|
+|apt install g++| 安装软件包（要管理员权限），另一个派系的是 yum install。|
+|cd /home|进入home目录。|
+|ls|罗列当前所在目录所有目录和文件。|
+|ifconfig|查看网卡信息包括IP地址，windows上是 ipconfig。|
+|tar -zxvf bin.tar.gz|解压文件到当前目录。|
+|tar -jxvf bin.tar.xz|解压文件到当前目录。|
+|tar -zxvf bin.tar.gz -C /home|解压文件到/home目录，记住是大写的C。|
+|tar -zcvf bin.tar.gz bin|将bin目录压缩成tar.gz格式文件（压缩比一般）。|
+|tar -jcvf bin.tar.xz bin|将bin目录压缩成tar.xz格式文件（压缩比高，推荐）。|
+|tar -... |j z 表示不同的压缩方法，x表示解压，c表示压缩。|
+|gedit 1.txt|用记事本打开文本文件。|
+|vim 1.txt |用vim打开文件，很多时候可以缩写用vi。|
+|./configure  make -j4  make install|通用编译源码命令，第一步./configure执行配置脚本，第二步make -j4启用多线程编译，第三步make install安装编译好的文件。|
+|./configure -prefix /home/liu/Qt-5.9.3-static -static -sql-sqlite -qt-zlib -qt-xcb -qt-libpng -qt-libjpeg -fontconfig -system-freetype -iconv -nomake tests -nomake examples -skip qt3d -skip qtdoc |Qt通用编译命令。|
+|./configure -static -release -fontconfig -system-freetype -qt-xcb -qt-sql-sqlite -qt-zlib -qt-libpng -qt-libjpeg -nomake tests -nomake examples -prefix /home/liu/qt/Qt5.6.3| Qt静态带中文。|
+|./configure -prefix /home/liu/Qt-5.9.3-static -static -release -nomake examples -nomake tests -skip qt3d|精简编译命令。|
+|./configure --prefix=host --enable-static --disable-shared --disable-doc|ffmpeg编译命令。|
 
 182. Qt自带的日志重定向机制非常简单好用，自从用了以后再也不用什么断点调试啥的了，在需要的地方支持qdebug输出对应的信息，而且发布程序以后也可以开启调试日志将其输出查看等。
 ```cpp
@@ -2273,7 +2431,9 @@ const char *data = buffer.constData();
 - 如果你需要一个真正的连接着的list，且需要保证一个固定插入耗时。那就用迭代器，而不是标签。使用QLinkedList()。
 - 如果你需要开辟连续的内存空间存储，或者你的元素远比一个指针大，这时你需要避免个别插入操作，出现堆栈溢出，这时候用QVector。
 - 如果更在意取值的速度则用QVector，QCustomPlot用的就是QVector，需要频繁大量的取出数据进行绘制。
-- 如果更在意更新数据（添加、删除等）的速度则用QList，就因为QChart用的是QList存取数据，也是导致大数据量卡顿的原因之一，一直被诟病。
+- 如果更在意更新数据（添加、删除等）的速度则用QList（对应操作是[]=值），但是因为QChart主要用的是QList访问数据（对应操作是at()），也是导致大数据量卡顿的原因之一，一直被诟病。
+- 曲线图表这类的基本上绝大部分时间都是在访问数据，拿到设置好的数据进行绘制。
+- 总之：QList更新（插入、追加等）数据速度快，QVector取数据速度快。
 - 在数据量很小的情况下两者几乎没啥性能区别。
 - 貌似Qt6对这两个类合并了（选择困难症的Qter解放了），QVector=QList即QVector是QList的别名，可能底层改了代码以便发挥两者的优势。
 
@@ -2339,70 +2499,70 @@ image:url(:/qss/flatwhite/checkbox_parcial_disable.png);
 ```cpp
 void frmSimple::initForm()
 {
-    row = 100;
-    column = 6;
+    //实例化数据模型
     model = new QStandardItemModel(this);
 
-    columnNames << "列标题1" << "列标题2" << "列标题3" << "列标题4" << "列标题5" << "列标题6";
-    columnWidths << 100 << 100 << 100 << 100 << 100 << 100;
+    //设置行数列数
+    row = 100;
+    column = 10;
+    //设置列名列宽
+    for (int i = 0; i < column; ++i) {
+        columnNames << QString("列%1").arg(i + 1);
+        columnWidths << 60;
+    }
 }
 
-void frmSimple::initTableView()
+void frmSimple::on_btnLoad1_clicked()
 {
-    //清空数据
-    model->clear();
     //先设置数据模型,否则 setColumnWidth 不起作用
     ui->tableView->setModel(model);
 
     //设置列数及列标题和列宽
     model->setColumnCount(column);
+    //简便方法设置列标题集合
+    model->setHorizontalHeaderLabels(columnNames);
     for (int i = 0; i < column; ++i) {
-        model->setHeaderData(i, Qt::Horizontal, columnNames.at(i));
         ui->tableView->setColumnWidth(i, columnWidths.at(i));
     }
 
     //循环添加行数据
+    QDateTime now = QDateTime::currentDateTime();
+    model->setRowCount(row);
     for (int i = 0; i < row; ++i) {
-        //循环添加一行的列
-        QList<QStandardItem *> items;
         for (int j = 0; j < column; ++j) {
             QStandardItem *item = new QStandardItem;
             //最后一列显示时间区别开来
             if (j == column - 1) {
-                QDateTime now = QDateTime::currentDateTime().addSecs(i);
-                item->setText(now.toString("yyyy-MM-dd HH:mm:ss"));
+                item->setText(now.addSecs(i).toString("yyyy-MM-dd HH:mm:ss"));
             } else {
-                item->setText(QString("行%1_列%2").arg(i + 1).arg(j + 1));
+                item->setText(QString("%1_%2").arg(i + 1).arg(j + 1));
             }
-            items << item;
+            model->setItem(i, j, item);
         }
-        model->appendRow(items);
     }
 }
 
-void frmSimple::initTableWidget()
+void frmSimple::on_btnLoad2_clicked()
 {
-    //清空数据
-    ui->tableWidget->clearContents();
-
     //设置列标题和列数及列宽
     ui->tableWidget->setColumnCount(column);
+    //简便方法设置列标题集合
     ui->tableWidget->setHorizontalHeaderLabels(columnNames);
     for (int i = 0; i < column; ++i) {
         ui->tableWidget->setColumnWidth(i, columnWidths.at(i));
     }
 
     //添加数据
+    QDateTime now = QDateTime::currentDateTime();
     ui->tableWidget->setRowCount(row);
     for (int i = 0; i < row; ++i) {
         for (int j = 0; j < column; ++j) {
             QTableWidgetItem *item = new QTableWidgetItem;
             //最后一列显示时间区别开来
             if (j == column - 1) {
-                QDateTime now = QDateTime::currentDateTime().addSecs(i);
-                item->setText(now.toString("yyyy-MM-dd HH:mm:ss"));
+                item->setText(now.addSecs(i).toString("yyyy-MM-dd HH:mm:ss"));
             } else {
-                item->setText(QString("行%1_列%2").arg(i + 1).arg(j + 1));
+                item->setText(QString("%1_%2").arg(i + 1).arg(j + 1));
             }
             ui->tableWidget->setItem(i, j, item);
         }
@@ -2410,8 +2570,658 @@ void frmSimple::initTableWidget()
 }
 ```
 
-### 二、升级到Qt6
-#### 2.1 直观总结
+### 20：191-200
+191. 关于QList队列的处理中，我们最常用的就是调用append函数添加item，往前插入item很多人第一印象就是调用insert(0,xxx)来插入，其实QList完全提供了往前追加item的函数prepend、push_front。
+```cpp
+QStringList list;
+list << "aaa" << "bbb" << "ccc";
+
+//往后追加 等价于 append
+list.push_back("ddd");
+//往前追加 等价于 prepend
+list.push_front("xxx");
+
+//往后追加
+list.append("ddd");
+//往前追加
+list.prepend("xxx");
+
+//指定第一个位置插入 等价于 prepend
+list.insert(0, "xxx");
+
+//输出 QList("xxx", "aaa", "bbb", "ccc", "ddd")
+qDebug() << list;
+```
+
+192. Qt内置了一些QList、QMap、QHash相关的类型，可以直接用，不用自己写个长长的类型。
+```cpp
+//qwindowdefs.h
+typedef QList<QWidget *> QWidgetList;
+typedef QList<QWindow *> QWindowList;
+typedef QHash<WId, QWidget *> QWidgetMapper;
+typedef QSet<QWidget *> QWidgetSet;
+
+//qmetatype.h
+typedef QList<QVariant> QVariantList;
+typedef QMap<QString, QVariant> QVariantMap;
+typedef QHash<QString, QVariant> QVariantHash;
+typedef QList<QByteArray> QByteArrayList;
+```
+
+193. Qt的布局的边距间隔，如果在没有改动过的情况下，是会根据系统分辨率以及缩放比来决定对应的默认值，是变化的，比如在1080P分辨率是9px，在2K分辨率又变成了11px，所有你会发现你在1080P电脑编译的程序，明明看到的是6px、9px，怎么到2K、4K分辨率下间隔和边距就变得好大，如果要保持无论何种分辨率都一样，你需要手动重新设置这些值，这里有个坑，比如默认是是9，你想其他分辨率也是9，你必须先把9改成其他值比如10，然后再改成9，这样才表示真的改动，你直接9改成9是不会变化的，在属性设计器中右侧有个小箭头恢复值的，也是灰色，只有加深显示，并且出现了恢复默认值箭头，才表示你确实是改过了值。
+
+194. Qt对高分屏以及dpi缩放的支持越来越成熟，在Qt4时代默认的策略就是跟随系统的缩放，从Qt5.6开始提供了 AA_EnableHighDpiScaling 的属性设置开启高分屏，到了5.14以后还可以指定缩放的策略 HighDpiScaleFactorRoundingPolicy 比如支持浮点数的缩放比而不是之前的整数倍，从Qt6开始默认永远开启了 AA_EnableHighDpiScaling 属性，没法取消。很多时候我们需要两种模式，一种就是永远不应用高分屏及缩放，一种就是自动应用高分屏及缩放。
+```cpp
+//永远不应用高分屏及缩放
+int main(int argc, char *argv[])
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
+    QApplication::setAttribute(Qt::AA_Use96Dpi);
+#endif
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+    QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Floor);
+#endif
+
+    QApplication a(argc, argv);
+    ....
+    return a.exec();
+}
+
+//自动应用高分屏及缩放
+//方法很多，综合对比下来还是采用配置文件指定缩放策略最适中。
+//新建qt.conf文件放到可执行文件同一目录
+[Platforms]
+WindowsArguments = dpiawareness=0
+
+//有时候想让用户去选择何种策略，需要开启高分屏的之后只需要将qt.conf文件放到可执行文件同一目录即可，就算代码中设置了不应用高分屏及缩放，也无效，也是优先取qt.conf文件的策略。
+```
+
+195. 关于QSS要注意的坑。
+- qss源自css，相当于css的一个子集，主要支持的是css2标准，很多网上的css3的标准的写法在qss这里是不生效的，所以不要大惊小怪。
+- qss也不是完全支持所有的css2，比如text-align官方文档就有说明，只支持 QPushButton and QProgressBar，务必看清楚。
+- 有时候偷懒直接来一句 *{xxx}，你会发现大部分是应用了，也有小部分或者极个别没有应用，你可能需要在对应的窗体中 this->setStyleSheet() 来设置。
+- qss的执行是有优先级的，如果没有指定父对象，则对所有的应用，比如在窗体widget中 {color:#ff0000;} 这样会对widget以及widget的所有子对象应用该样式，这种问题各大群每周都有人问，你会发现各种奇奇怪怪的异样不正常，怎么办呢，你需要指定类名或者对象名，比如 #widget{color:#ff0000;} 这样就只会对widget对象应用该样式，另一种写法 QWidget#widget{color:#ff0000;}，只想对窗体本身而不是子控件按钮标签等 .QWidget{color:#ff0000;} ，具体详细规则参见官方说明。
+- qss整体来说还是可以的，解析速度性能在Qt5高版本后期比Qt4好很多，尤其是修复了不少qss中的解析绘制BUG。尽管有这样那样的BUG，怀着包容的心对待它。
+- qss官方学习地址1：[http://47.100.39.100/qtwidgets/stylesheet-reference.html](http://47.100.39.100/qtwidgets/stylesheet-reference.html)
+- qss官方学习地址2：[http://47.100.39.100/qtwidgets/stylesheet-examples.html](http://47.100.39.100/qtwidgets/stylesheet-examples.html)
+
+196. 关于Qt延时的几种方法。
+```cpp
+void QUIHelperCore::sleep(int msec)
+{
+    if (msec <= 0) {
+        return;
+    }
+
+#if 1
+    //非阻塞方式延时,现在很多人推荐的方法
+    QEventLoop loop;
+    QTimer::singleShot(msec, &loop, SLOT(quit()));
+    loop.exec();
+#else
+#if (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
+    //阻塞方式延时,如果在主线程会卡住主界面
+    QThread::msleep(msec);
+#else
+    //非阻塞方式延时,不会卡住主界面,据说可能有问题
+    QTime endTime = QTime::currentTime().addMSecs(msec);
+    while (QTime::currentTime() < endTime) {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+    }
+#endif
+#endif
+}
+```
+
+197. 随着国产化的兴起，各种国产系统和国产数据库等逐渐进入开发者的世界，罗列几个要点。
+- 中标麒麟neokylin基于centos。
+- 银河麒麟kylin早期版本比如V2基于freebsd，新版本V4、V10基于ubuntu。
+- 优麒麟ubuntukylin就是ubuntu的汉化版本，加了点农历控件啥的。
+- deepin基于debian。
+- uos基于deepin或者说是deepin的商业分支。
+- ubuntu基于debian。
+- linux界主要分两种发行版本，debian（ubuntu、deepin、uos、银河麒麟kylin等）和redhat（fedora、centos、中标麒麟neokylin、中兴新支点newstart等），分别对应apt-get和yum安装命令。绝大部分的linux系统都基于或者衍生自这两种发行版本。
+- 理论上基于同一种系统内核的，在其上编译的程序可以换到另外的系统运行，前提是编译器版本一致，比如都是gcc4.9，在ubuntu14.04 64位用gcc4.9编译的Qt程序，是能够在uos 64位上运行的。
+- 高版本编译器的系统一般能够兼容低版本的，比如你用gcc4.9编译的程序是能够在gcc7.0上运行，反过来不行。
+- 意味着如果你想尽可能兼容更多的系统，尽量用低版本的编译器编译你的程序，当然要你的程序代码语法支持，比如c++11就要从gcc4.7开始才支持，如果你的代码用了c++11则必须至少选择gcc4.7版本及以上。
+- 用Qt编写linux程序为了发布后的可执行文件可以兼容各种linux系统，只要在这两种内核（debian、redhat）的系统上用低版本的编译器比如gcc4.7编译qt程序发布即可。
+- 2022-01-27补充：根据Qt官方安装包（关于对话框），发现基于redhat和gcc4.9（后面Qt5.14/5.15带的qtc采用gcc5.3）编译器发布的，通用各种linux系统（亲测ubuntu各个版本、fedora、centos、deepin、uos、银河麒麟kylin、中标麒麟neokylin、中兴新支点newstart等），自己按照这个版本也亲测打包发布了，亲测可用，我擦，redhat系统的也可以在debian系统跑。
+- 2022-02-10补充：debian上静态编译的程序也可以在redhat系统跑，可能静态编译去掉了很多依赖吧。
+- 2022-03-01补充：低调大佬补充，如果没有特定的依赖关系，高版本的编译器编译的程序也可以在低版本编译器的系统运行，比如alpine Linux下用gcc11/clang13编译生成的可执行二进制，依然可以在cenos5/ubuntu10上运行。并不是编译器版本的问题，也不是C++11特性的问题，这个问题涉及到太多，内核版本、gnu libc、ABI兼容等等，两句话说不清。
+- 按照QtCreator软件采用的编译器环境规则，一般来说就是低版本的可以在高版本运行，比如Qt5可以在ubuntu14/16/18/20运行，但是高版本编译器编译的就无法在低版本编译器系统运行，会提示缺少GLBC、LIBCXX、symbol xxxxxx等，比如Qt6可以在ubuntu20运行而无法在ubuntu18/16/14等运行。
+- 在uos上做开发，建议采用系统自带的Qt库环境开发，以及命令行安装开发环境，不建议使用Qt官方的安装包搭建环境，因为uos的Qt是魔改过的，用Qt官方的标准安装包的环境开发出来的程序，打包发布很可能会有依赖问题而无法运行，而用系统自带的就不存在这个问题。
+- 国产人大金仓数据库用的是postgresql数据库改的，意味着你在Qt中用postgresql数据库插件也是能够连接到人大金仓数据库的。
+- 以上未必完全正确，欢迎各位指正。
+
+198. 纵观Qt的发展历史，也几乎经历着合久必分、分久必合的逻辑，比如最开始QPushButton等UI控件类都是在QtGui模块中，后面越发臃肿不方便管理和升级迭代，又分离出一个QtWidgets模块；到Qt6又将QList和QVector合并了成了一个类，搞得像分久必合；而且一些数学函数以及封装的c++标准函数库的方法，逐渐放弃了Qt自己的封装改用c++标准函数库，从开始的分到现在的合统一。
+
+199. Qt一直在持续升级迭代，尽管新增加的代码质量明显不如诺基亚时代，但最起码有行动，慢慢完善。目前主要的升级改善在qml模块，底层也有完善，毕竟无论是widget还是qml都是公用一套底层逻辑类，底层基础一定要扎实稳固，个人这几年一直对比测试过不同Qt版本（从旧版本到新版本）很多类和函数的性能，发现官网列出来的新版本对应类和方法的性能提升改善，确实没有说谎，至于提升了多少这块有没有吹牛逼那就不清楚。
+- base64算法性能提升很大。
+- QStringList等凡是使用了QList相关的类，性能提升巨大。
+- 对比测试大概从5.12版本开始QStringList和QMap性能相当。
+- 早期版本QStringList如果查找的值先插入则时间越短，QMap则没有这个区别。
+```cpp
+QStringList list1, list2;
+QMap<QString, QString> map;
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+
+    for (int i = 0; i < 100000; ++i) {
+        QString s1 = QString("%1").arg(i);
+        QString s2 = QString("A%1").arg(i);
+        list1 << s1;
+        list2 << s2;
+        map.insert(s1, s2);
+    }
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    QElapsedTimer time;
+    time.start();
+    qDebug() << "111" << time.nsecsElapsed() << list2.at(list1.indexOf("9999"));
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    QElapsedTimer time;
+    time.start();
+    qDebug() << "222" << time.nsecsElapsed() << map.value("9999");
+}
+```
+
+200. 关于QtCreator中三种不同编译版本 debug、release、profile 的区别。
+- debug调试模式，编译后的可执行文件很大，带了很多调试符号信息等，方便开发阶段调试的时候进入具体的堆栈查看值。会打开所有的断言，运行阶段性能差速度慢，可能会有卡顿感觉。
+- release发布模式，编译后的可执行文件很小，不带任何调试符号信息，一般用于打包发布程序。由于经过了各种优化，会关闭所有断言，运行阶段性能最好，如果有卡顿那肯定是你的程序问题。
+- profile概述模式，编译后的可执行文件比debug小很多比release大一点，带有部分调试符号信息，在debug和release之间取一个平衡，兼顾性能和调试，性能更优但是又方便调试。
+- 使用Qt5.7版本对应三种模式编译的空白窗体程序大小：debug（1319kb）、release（24kb）、profile（90kb）。
+- debug链接的库是带d结尾的，release和profile链接的库是不带d结尾的，很多人以为profile链接的是带d结尾的其实是错误的。
+- 新的Qt在线安装程序在安装的时候，可以勾选是否安装debug调试库（对应lib目录下一堆带d结尾的文件），以前的版本是默认都安装，现在可选安装以便减少体积。
+- 无论是否安装了debug调试库，你都可以选择debug模式生成对应debug的文件，这个不知道怎么做到的。
+- 无论是哪种模式，都可以在程序中开启日志钩子输出日志信息，方便收集运行阶段的各种信息反馈给开发人员查看问题。
+- 最初的开发工具一般是具有debug和release两种模式，随着用户需求的增加和场景的需要，部分开发工具衍生出了profile模式，更有甚者比如flutter还有第四种test模式。
+
+### 21：201-210
+201. 编译生成debug版本动态库，文件末尾自动加上d结尾。
+```cpp
+CONFIG(debug, debug|release) {
+    win32:      TARGET = $$join(TARGET,,,d)
+    mac:        TARGET = $$join(TARGET,,,_debug)
+    unix:!mac:  TARGET = $$join(TARGET,,,d)
+}
+```
+
+202. QtCreator中pro项目文件格式说明。
+
+|名称|说明|
+|:------|:------|
+|QT += core gui|添加本项目中需要的模块，影响后面代码文件include的时候自动弹出下拉选择，如果pro文件没有引入该模块则无法自动语法提示，一般打包发布的时候对应动态库文件比如 Qt5Core.dll。|
+|TARGET = xxx|生成最后目标文件的名字，可以是可执行文件或者库文件。|
+|TEMPLATE = app|项目程序的生成模式，默认是app表示生成可执行文件程序，如果是动态库项目就是 TEMPLATE = lib。|
+|CONFIG += qaxcontainer|引入一些配置，在Qt4的时候还用来引入一些模块，其中有部分改成了QT += 方式引入，比如Qt5引入本地activex控件支持改成了QT += qaxcontainer。|
+|DEFINES += xxx|项目中自定义的一些定义，可以在代码文件中识别，通常用来定义一些不同平台的处理，根据项目需要自己定义任何标识。| 
+|HEADERS += head.h|项目中用到的头文件，一般拓展名是.h，可以写在一行也可以分行写，分行要用 \ 斜杠结束。|
+|SOURCES += main.cpp|项目中用到的实现文件，一般拓展名是.cpp，可以写在一行也可以分行写，分行要用 \ 斜杠结束。|
+|FORMS += Form.ui|项目中用到的UI文件，一般拓展名是.ui，可以写在一行也可以分行写，分行要用 \ 斜杠结束。|
+|RESOURCES += main.qrc|项目中用到的资源文件，可以多个，写代码使用对应资源文件中的文件时候务必记得资源文件中的前缀。|
+|LIBS += -L$$PWD/ -lavformat -lavcodec|项目中编译时候链接依赖的库，一般是 .lib .a .dylib 文件，可以写在一行，省略文件名的lib打头部分，也可以分多行绝对路径和全名称。|
+|DESTDIR += $$PWD/bin|目标生成路径，$$PWD表示当前目录，一般建议生成的最终文件重定向到另外目录存放，好找，不然一堆临时文件在里面有时候文件太多好难找。|
+|INCLUDEPATH += $$PWD/include|工程需要的头文件，指定整个目录，写代码的时候找到的话会自动下拉。|
+|DEPENDPATH += |工程的依赖路径，用的比较少，一般涉及到引入链接库的时候可能需要。|
+|include($$PWD/3rd.pri)|引入pri模块文件，pri最大的好处就是分目录管理文件，通用的轮子模块可以放到一个目录下，然后用pri统一管理，可以给多个项目公用。|
+
+**官方详细地址[https://doc.qt.io/qt-5/qmake-variable-reference.html](https://doc.qt.io/qt-5/qmake-variable-reference.html)**
+
+203. 如果发现之前编译正常，突然之间再编译就一直死循环的样子，停留在一行提示并疯狂不停的打印，或者提示文件时间在未来，这说明你很可能改过开发环境的时间（比如测试某个授权文件失效），导致有修改过文件的保存时间在未来，你只需要将时间调整回来，将最后更新时间不正确的代码文件重新保存下就行。Qt的增量编译是根据文件的最后修改时间来判定的，最后的修改时间比上一次的修改时间还要新则认为该文件被修改过，需要重新编译该文件。
+
+204. Qt的构建套件一般是在安装Qt开发环境的时候自动设置的，当然也可以手动设置，手动设置的时候千万要注意编译器和Qt库必须一致，否则该构建套件是有问题的，千万不能乱设置，尤其是对构建套件命名的时候最好标明qt版本和编译器版本，最好也要一致，不要说名称叫msvc而编译器选择的确是mingw，这样尽管能正常使用该构建套件，但是会造成一种误解，还以为该套件是msvc的，其实里面是mingw的。有个qter说他的qt坏了，死活编译失败，远程一看，尼玛，构建套件名称写的qt_msvc2019 编译器选择的msvc2015（他电脑只安装了vs2015），qt库选择的mingw！差点狂扇自己八个耳光，太离谱了！
+
+205. 当你编译Qt程序发现编译通不过提示报错，而且报错提示在Qt的头文件的时候，不要去尝试着修改Qt头文件来编译通过，那样没用的，你使用的Qt的库是已经根据原始的头文件编译好的。如果报错提示在编译生成的临时的moc等文件，你也不要尝试去修改他，那个是临时文件，这次你改好了也许编译通过了，你重新编一下又覆盖了还是旧的错误。总之你要从源头（你的代码）找问题。
+
+206. 有时候需要对文本进行分散对齐显示，相当于无论文字多少，尽可能占满整个空间平摊占位宽度，但是在对支持对齐方式的控件比如QLabel调用 setAlignment(Qt::AlignJustify | Qt::AlignVCenter) 设置分散对齐会发现没有任何效果，这个时候就要考虑另外的方式比如通过控制字体的间距来实现分散对齐效果。
+```cpp
+QString text = "测试分散对齐内容";
+//计算当前文本在当前字体下占用的宽度
+QFont font = ui->label->font();
+int textWidth = ui->label->fontMetrics().width(text);
+//显示文本的区域宽度=标签的宽度-两边的边距
+int width = ui->label->width() - 12;
+//需要-1相当于中间有几个间隔
+int count = text.count() - 1;
+//计算每个间距多少
+qreal space = qreal(width - textWidth) / count;
+//设置固定间距
+font.setLetterSpacing(QFont::AbsoluteSpacing, space);
+ui->label->setFont(font);
+ui->label->setText(text);
+```
+
+207. 随着需求的不断增加，程序不断变大，用到的动态库也越来越多，到了发布程序的时候你会发现和可执行文件同一目录下文件数量真多，此时可能会考虑如何将一些库文件分门别类的存放，这样方便管理。
+- Qt提供的设置动态库路径的方法setLibraryPaths是用来搜索插件动态库的，而不是程序直接依赖的动态库。
+- 很多人以为这个可以设置Qt的库或者程序中依赖的第三方库的路径，其实想想也知道，因为程序依赖这个库，找不到的话根本跑不起来，程序跑不起来怎么应用执行这个代码呢？
+- Qt默认是可用通过setLibraryPaths的方式设置Qt插件的动态库目录位置，比如数据库插件sqldrivers，因为这些库文件是真正在Qt程序跑起来以后通过插件形式去加载的。
+- 还可以通过qt.conf文件设置 Plugins="config" 指定所有插件在可执行文件下的config目录下。
+- 要想设置程序直接依赖的动态库在其他目录，找遍全宇宙也只有一个办法，那就是设置环境变量，除此别无他法。
+- 至于如何设置环境变量方式很多，比如手动在电脑上设置，或者搞个批处理文件执行命令行，在程序安装的时候自动执行，或者程序打包目录下用户手动运行这个批处理。
+- 大神补充：设置插件的目录还可以通过在main函数最前面写 qputenv("PATH", QString("%1;%2").arg(qgetenv("PATH"), pluginFileInfo.path()).toLocal8Bit()); 来实现。
+- 网友补充：最终找插件的路径其实就是这个 QT_PLUGIN_PATH 环境变量。
+
+208. 进度条控件如果设置的垂直方向，就算你设置了文本可见，会发现根本看不到进度文本，经过多方百折不挠的试探，以及和酷码大佬深入的探讨，发现只要设置下border样式（border:1px solid #ff0000、border:none、border-style:solid、border-radius:0px 任意一种）就行，就可以把文本显示出来，这TM就不知道Qt为什么总是不统一规则，这个BUG通用于任何版本，这个可能是因为边框的solid样式冲突了导致无法继续绘制，确切的说这必须是BUG，这个锅Qt必须背。
+
+209. 我们在使用QFileDialog::getOpenFileName、QFileDialog::getExistingDirectory等方法时，有时候会发现首次打开很卡，尤其是在默认目录很多文件的时候，此时你可以考虑设置这些函数最末尾的参数为QFileDialog::DontUseNativeDialog，表示不采用本地系统对话框，这样的话会采用Qt的对话框，速度快很多，估计系统的对话框在打开的时候会做很多初始化加载处理。
+```cpp
+QFileDialog::getOpenFileName(this, "", "", "", 0, QFileDialog::DontUseNativeDialog);
+QFileDialog::getExistingDirectory(this, "", "", QFileDialog::DontUseNativeDialog);
+```
+
+210. 滑块控件QSlider，如果设置的垂直样式，其进度颜色和剩余颜色，刚好和横向样式的颜色相反的，不确定这个是否是Qt的BUG，Qt456都是这个现象。
+```cpp
+QSlider::groove:horizontal{
+height:8px;
+background:#FF0000;
+}
+
+QSlider::add-page:horizontal{
+height:8px;
+background:#FF0000;
+}
+
+QSlider::sub-page:horizontal{
+height:8px;
+background:#00FF00;
+}
+
+QSlider::handle:horizontal{
+width:10px;
+background:#0000FF;
+}
+
+QSlider::groove:vertical{
+width:8px;
+background:#FF0000;
+}
+
+QSlider::add-page:vertical{
+width:8px;
+background:#00FF00;
+}
+
+QSlider::sub-page:vertical{
+width:8px;
+background:#FF0000;
+}
+
+QSlider::handle:vertical{
+height:10px;
+background:#0000FF;
+}
+```
+
+### 22：211-220
+211. QMainWindow 在对停靠窗体进行排列的时候，有些不常用的设置容易遗忘，建议将 QMainWindow 的头文件函数过一遍一目了然。详细介绍各种停靠参数文章参见 [https://zhuanlan.zhihu.com/p/388544168](https://zhuanlan.zhihu.com/p/388544168)。
+```cpp
+//设置允许各种嵌套比如上下排列左右排列非常灵活
+//此设置会和下面的 setDockOptions 中的参数覆盖所以要注意顺序
+//this->setDockNestingEnabled(true);
+
+//设置停靠参数,不允许重叠,只允许拖动和嵌套
+this->setDockOptions(AnimatedDocks | AllowNestedDocks);
+
+//将底部左侧作为左侧区域，底部右侧作为右侧区域，否则底部区域会填充拉伸
+this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
+this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+```
+
+212. 当我们在对QModelIndex取数据的时候，常规的角色的数据（QVariant类型支持to的比如toString、toInt、toDouble等）可以很方便的取出来，特定的数据类型需要用的万能取值模板函数 T value() 取出来。
+```cpp
+//显示文本
+QString text = index.data(Qt::DisplayRole).toString();
+//文本对齐
+int align = index.data(Qt::TextAlignmentRole).toInt();
+//文字字体
+QFont font = index.data(Qt::FontRole).value<QFont>();
+//前景色
+QColor color = index.data(Qt::ForegroundRole).value<QColor>();
+//背景色
+QColor color = index.data(Qt::BackgroundRole).value<QColor>();
+```
+
+213. 很多人以为拖曳只要在dropEvent事件就可以了，其实不行的，没有效果的，需要先在dragEnterEvent事件中执行event->accept()才行，不然根本没有效果，很多人尤其是初学者都挂在这里，我就是在这里摔了一跤，好疼！
+```cpp
+void frmMain::dropEvent(QDropEvent *event)
+{
+    QList<QUrl> urls = event->mimeData()->urls();
+}
+
+void frmMain::dragEnterEvent(QDragEnterEvent *event)
+{
+    if(event->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist")) {
+        event->setDropAction(Qt::MoveAction);
+        event->accept();
+    } else {
+        event->ignore();
+    }
+}
+```
+
+214. Qt5.6以后内置的是webengine浏览器内核，如果需要做web交互的话必须用到 qwebchannel.js 这个文件，此文件是Qt官方提供的，所以不建议去改动其中的源码，要注意的是，由于官方对webengine的支持在不断更新，所以官方提供的对应Qt版本的 qwebchannel.js 文件也不同，意味着你要用对应提供的版本的 qwebchannel.js 文件才ok，该文件默认在 C:\Qt\Qt5.12.11\Examples\Qt-5.12.11\webchannel\shared 目录下。经过几十个Qt版本的测试发现，用高版本的 qwebchannel.js 放到低版本运行不行，低版本放到高版本可以，为了万无一失还是建议直接用对应版本的。
+
+215. 对于QString去除空格，有多种场景，可能需要去除左侧、右侧、所有等位置的空格。
+```cpp
+//字符串去空格 -1=移除左侧空格 0=移除所有空格 1=移除右侧空格 2=移除首尾空格 3=首尾清除中间留一个空格
+QString QUIHelperData::trimmed(const QString &text, int type)
+{
+    QString temp = text;
+    QString pattern;
+    if (type == -1) {
+        pattern = "^ +\\s*";
+    } else if (type == 0) {
+        pattern = "\\s";
+        //temp.replace(" ", "");
+    } else if (type == 1) {
+        pattern = "\\s* +$";
+    } else if (type == 2) {
+        temp = temp.trimmed();
+    } else if (type == 3) {
+        temp = temp.simplified();
+    }
+
+    //调用正则表达式移除空格
+    if (!pattern.isEmpty()) {
+#if (QT_VERSION >= QT_VERSION_CHECK(6,0,0))
+        temp.remove(QRegularExpression(pattern));
+#else
+        temp.remove(QRegExp(pattern));
+#endif
+    }
+
+    return temp;
+}
+
+//测试代码
+QString text = "  a  b  c d  ";
+//结果：a  b  c d  
+QUIHelper::trimmed(text, -1);
+//结果：abcd  
+QUIHelper::trimmed(text, 0);
+//结果：  a  b  c d
+QUIHelper::trimmed(text, 1);
+//结果：a  b  c d
+QUIHelper::trimmed(text, 2);
+//结果：a b c d
+QUIHelper::trimmed(text, 3);
+```
+
+216. Qt的网络库支持udp广播搜索和组播搜索，其中组播搜索可以跨网段搜索，有时候你会发现失灵，此时你可以尝试把本地的虚拟机的网卡禁用试试，估计就好了。还有就是在本地开启了代理啥的，先关掉试试。近期在使用tcpsocket连接的时候，发现在Qt4和Qt5中正常的程序，到了Qt6中就不行了，报错提示 The proxy type is invalid for this operation ，原来是本地设置了代理导致的，可能在Qt6以前会默认跳过去不处理。
+```cpp
+//也可以通过代码设置跳过代理
+#include <QNetworkProxy>
+QNetworkProxyFactory::setUseSystemConfiguration(false);
+//下面这样每次设置也可以
+tcpSocket->setProxy(QNetworkProxy::NoProxy);
+
+//查阅到文章 https://www.cnblogs.com/cppskill/p/11730452.html
+//从5.8开始socket默认代理类型是DefaultProxy而不是NoProxy，不知道出于什么考虑。
+```
+
+217. 关于交叉编译，对于初学者来说是个极难跨过去的砍（一旦跨过去了，以后遇到需要交叉编译的时候都是顺水推舟、信手拈来。），因为需要搭建交叉编译环境，好在现在厂家提供的板子基本上都是测试好的环境，尤其是提供的编译器，不用自己再去折腾，按照官方手册来基本上不会有啥的的问题。
+- 在linux系统上编译ffmpeg和qt都是非常简单的事情，初学者也会，前提只要本地的gcc g++编译器正常。
+- 任何编译器包括嵌入式编译器，为了确保环境正常，你可以先查看对应的编译器版本是否ok，g++ -v  arm-linux-g++ -v。
+- 交叉编译器查看版本 /opt/FriendlyARM/toolschain/4.5.1/bin/arm-linux-g++ -v 。
+- 编译器位数和操作系统位数有关，一般32位的编译器要在32位的系统上做交叉编译，虽然32位也可以在安装依赖后，在64位系统做交叉编译，但是个人不建议，可能会出问题。64位的编译器只能在64位的系统。
+- 设置了环境变量则可以省略掉长长的路径，直接打可执行文件名称即可，没有设置环境变量则需要打完整路径。
+- 设置环境变量只是为了编译的时候让自动寻找编译器，其实也完全可以不用设置环境变量，使用绝对路径指定编译器位置即可。
+- 在linux上编译，无论是ffmpeg还是qt还是其他，都是通用的步骤，第一步：./configure  第二步：make  第三步：make install 。
+- 至于具体configure后面有哪些参数，参照对应源码包的手册就行，搜索也一大堆。当然你用默认的就不带任何参数一般也可以，自动采用默认参数进行编译。
+- 交叉编译ffmpeg命令：./configure --prefix=host --enable-static --disable-shared --disable-doc --cross-prefix=/opt/FriendlyARM/toolschain/4.5.1/bin/arm-linux- --arch=arm --target-os=linux
+- 交叉编译qt前提：修改mkspecs/qws/linux-arm-g++下面的qmake.conf，如果没有设置环境变量则设置对应编译器的绝对路径，并将编译器的名字改成你需要的。
+- 比如修改gcc编译器：QMAKE_CC = /opt/FriendlyARM/toolschain/4.5.1/bin/arm-linux-gcc
+- 交叉编译qt4.8.5命令：./configure -prefix host -embedded arm -xplatform qws/linux-arm-g++ -release -opensource -confirm-license -qt-sql-sqlite -qt-gfx-linuxfb -plugin-sql-sqlit -no-qt3support -no-phonon -no-svg -no-webkit -no-javascript-jit -no-script -no-scripttools -no-declarative -no-declarative-debug -qt-zlib -no-gif -qt-libtiff -qt-libpng -no-libmng -qt-libjpeg -no-rpath -no-pch -no-3dnow -no-avx -no-neon -no-openssl -no-nis -no-cups -no-dbus -little-endian -qt-freetype -no-opengl -no-glib -nomake demos -nomake examples -nomake docs -nomake tools
+- 交叉编译qt5.9.8命令：./configure -prefix host -xplatform linux-arm-g++ -recheck-all -opensource -confirm-license -optimized-qmake -release -no-separate-debug-info -strip -shared -static -c++std c++1z -no-sse2 -pch -compile-examples -gui -widgets -no-dbus -no-openssl -no-cups -no-opengl -linuxfb -qt-zlib -qt-libpng -qt-libjpeg -qt-freetype
+- 综上所述交叉编译和常规的编译就一个区别，需要手动指定交叉编译器路径。ffmpeg是通过--cross-prefix=指定，qt比较庞大是通过更改配置文件最后通过-xplatform指定配置文件名称。
+- Qt6的编译比较繁琐，默认用cmake编译，在linux上先用cmake3.19以上版本的源码，用make编译生成cmake，然后再用cmake编译qt生成qmake，最后调用qmake来编译你的qt项目。
+- 编译Qt其实只是想用其中的库，至于demo、doc、tool、example等统统不用，费时费力。所以强烈建议编译的时候去掉，大大加快编译速度。
+- 编译建议用普通用户编译即可，包括解压源码，因为这样编译出来的库普通用户就能用，如果是root管理员编译的则以后都需要管理员权限才行。
+- 很多系统都提供了直接鼠标右键解压，其实也是可以的，就是速度慢，建议用命令行解压和删除目录。
+- Qt的编译参数每个版本都可能有出入，毕竟一直在更新代码，甚至有些分类描述变了，比如之前-qt-xcb到了5.15改成了-xcb，之前-qt-sql-sqlite改成了-qt-sqlite，一定要看源码下的readme，里面约定了编译环境要求的最低版本，后面qt5开始具体的配置参数有哪些放到了qtbase目录下的config说明。
+- 编译完成使用如果遇到提示 GL/gl.h 错误，需要安装 apt install libgl1-mesa-dev libglu1-mesa-dev  或者 yum install mesa-libGL-devel mesa-libGLU-devel 。
+- 编译参数说明可参考 [https://blog.csdn.net/xi_gua_gua/article/details/53413930](https://blog.csdn.net/xi_gua_gua/article/details/53413930)。
+
+218. 在Qt中设置图片有时候会发现不成功，很可能是因为文件的拓展名不正确导致的，比如jpg的图片拓展名是png，bmp的图片拓展名改成了jpg，QImage、QPixmap传入文件路径加载图片，是通过拓展名去调用对应的图片解析算法，比较傻，但是速度快，不用经过分析具体内部是何种图片格式。如果想要不管拓展名都能保证加载成功，则必须读取图片文件数据加载的方式处理。
+```cpp
+//可以是资源文件中的图片也可以是本地文件
+QString fileName = ":/test.png";
+
+//此方式按照拓展名来区分具体格式不准确
+//如果拓展名不正确就无法加载成功
+ui->label->setPixmap(QPixmap(fileName));
+
+//通过直接读取图片数据加载保证成功
+QFile file(fileName);
+file.open(QIODevice::ReadOnly);
+QByteArray data = file.readAll();
+
+//通过 QImage 处理
+QImage img;
+img.loadFromData(data);
+//下面这种方式也行
+//QImage img = QImage::fromData(data);
+ui->label->setPixmap(QPixmap::fromImage(img));
+
+//通过 QPixmap 处理
+QPixmap pix;
+pix.loadFromData(data);
+ui->label->setPixmap(pix);
+```
+
+219. 总结几个Qt版本的冷知识。
+- Qt4.8.7是Qt4的终结版本，是Qt4系列版本中最稳定最经典的（很多嵌入式板子还是用Qt4.8），其实该版本是和Qt5.5差不多时间发布的。参考链接 [https://www.qt.io/blog/2015/05/26/qt-4-8-7-released](https://www.qt.io/blog/2015/05/26/qt-4-8-7-released) [https://blog.qt.io/blog/2015/07/01/qt-5-5-released/](https://blog.qt.io/blog/2015/07/01/qt-5-5-released/)
+- Qt5.6.3最最后支持xp系统的长期支持版本，Qt5.7.0是最后支持xp系统的非长期支持版本（有可能有极少数函数不支持，个人没遇到过）。
+- Qt5.12.3是最后提供mysql数据库插件的版本，往后的版本需要自行编译对应的mysql数据库插件，官方安装包不再提供。
+- Qt5.12.5是最后样式表性能最高的版本，经过酷码大佬查阅代码发现此后版本的样式表源码中为了修复一个bug做了循环嵌套设置，导致性能急剧下降，界面越多性能暴降10倍以上。
+- Qt5.14.2是最后提供二进制安装包的版本，后面的版本都需要在线安装。
+- Qt5.15系列是最后支持win7的版本，后面的Qt6系列版本需要更改源码编译才能支持win7，这对于小白来说难于上青天。
+- Qt6.0/6.1版本其实也是支持win7的，但是因为缺失太多模块，而且BUG成山，大佬说了狗都不用，所以使用此版本没意义。
+- Qt6不支持win7，是说开发阶段和运行阶段都不支持，无论开发阶段还是运行阶段你都需要Qt的库，只要是Qt的库不支持，到哪里也不支持。
+- 新版的qtc7由于采用Qt6编译，所以也只能在win10及以上运行，意味着你要用新的qtc7+Qt5做开发也必须用win10及以上。
+- 欢迎各位补充，比如哪个版本以后商用需要收费之类的，貌似用Qt4，在不更改Qt本身源码，动态库发布程序，法律风险小一些？
+
+220. Qt官方除了Qt库一直在升级外，对应的集成开发环境也在更新升级，一般会选用最新的Qt库编译新版本，要注意的是，有些人安装的旧版本的qtc，加载比较高版本的Qt库，很容易出现报错提示 Project ERROR: Cannot run compiler 'g++'. Maybe you forgot to setup the environment? 之类的，一般是版本跨度过大，比如用Qt5.5附带的qtc加载Qt5.9的库，导致有些环境识别不到，可能是qtc在新版本中对某些识别处理规则有变动。所以一般建议可以用新的qtc加载旧的Qt库，不建议旧的qtc加载新的Qt库。
+
+### 23：221-230
+221. 在对表格数据模型操作的时候，经常遇到一种场景就是，删除某条记录后，希望重新选中某一行。QTableView、QTableWidget本身就支持多选全选等操作，比如批量删除可以多选。
+```cpp
+//拿到表格数据模型
+QAbstractItemModel *model = ui->tableView->model();
+//主动定位到第三行
+ui->tableView->setCurrentIndex(model->index(3, 0));
+//主动定位到最后一行
+ui->tableView->setCurrentIndex(model->index(model->rowCount() - 1, 0));
+
+//设置选择模式支持多选，其他几个枚举值自行查阅文档。
+ui->tableView->setSelectionMode(QAbstractItemView::MultiSelection);
+
+//选择全部
+ui->tableView->selectAll();
+//取消所有选中
+ui->tableView->clearSelection();
+
+//选中行，注意如果该行选中则执行后取消选中，如此往复。这个设计很巧妙，掌声。
+ui->tableView->selectRow(row);
+//选中列，注意如果该列选中则执行后取消选中，如此往复。这个设计很巧妙，掌声。
+ui->tableView->selectColumn(column);
+
+//获取选中行的内容
+QItemSelectionModel *selections = ui->tableView->selectionModel();
+QModelIndexList selected = selections->selectedIndexes();
+foreach (QModelIndex index, selected) {
+    qDebug() << index.row() << index.column() << index.data();   
+}
+```
+
+222. 在读取文本文件的时候，有时候会发现读取出来的中文乱码，这个时候就需要识别文件编码格式，然后主动设置对应的编码去读取就不会乱码。
+```cpp
+//检查文件编码 0=ANSI 1=UTF-16LE 2=UTF-16BE 3=UTF-8 4=UTF-8BOM
+int DataCsv::findCode(const QString &fileName)
+{
+    //假定默认编码utf8
+    int code = 3;
+    QFile file(fileName);
+    if (file.open(QIODevice::ReadOnly)) {
+        //读取3字节用于判断
+        QByteArray buffer = file.read(3);
+        quint8 b1 = buffer.at(0);
+        quint8 b2 = buffer.at(1);
+        quint8 b3 = buffer.at(2);
+        if (b1 == 0xFF && b2 == 0xFE) {
+            code = 1;
+        } else if (b1 == 0xFE && b2 == 0xFF) {
+            code = 2;
+        } else if (b1 == 0xEF && b2 == 0xBB && b3 == 0xBF) {
+            code = 4;
+        } else {
+            //尝试用utf8转换,如果可用字符数大于0,则表示是ansi编码
+            QTextCodec::ConverterState state;
+            QTextCodec *codec = QTextCodec::codecForName("utf-8");
+            codec->toUnicode(buffer.constData(), buffer.size(), &state);
+            if (state.invalidChars > 0) {
+                code = 0;
+            }
+        }
+
+        file.close();
+    }
+
+    return code;
+}
+```
+
+223. 在连接远程数据库进行查询数据的时候，有时候会发现很慢，尤其是表数据量越多越慢，本地的话同等数据量快很多，可以尝试开启只前进属性，query.setForwardOnly(true);这样的话只会缓存一次的数据，大大提高远程数据库的查询效率，据说可以提高几十倍百倍的速度。当然前提是对查询的数据之前向前取数据的需求，如果还要往后取数据或者在数据模型QSqlQueryModel中使用，则不能开启此属性。原因在每次利用QSqlQuery获取下一条记录时，若不开启isForwardOnly属性（很遗憾默认就是不开启），则每次都开辟新的内存空间，来存储已经访问及未访问的记录，这样，每次都会浪费好多存储空间。
+
+224. Qt中的painter绘制非常灵活强大，接口丰富，但是对于很多初学者来说还是有一定的难度，尤其是各种奇奇怪怪的复杂格式，而这些格式用html确很好描述，比如控制行间距、字符间距等，此时可以用QTextDocument传入html格式内容交给QPainter绘制，非常完美、简单、强大，包括一些数学公式啥的。
+```cpp
+void Form::paintEvent(QPaintEvent *event)
+{
+    QPainter painter(this);
+    QTextDocument doc;
+    doc.setHtml(html);
+    //设置文本宽度
+    doc.setTextWidth(200);
+    //指定绘制区域
+    doc.drawContents(&painter, QRect(0, 0, 200, 70));
+}
+```
+
+225. Qt中样式表对选中颜色和悬停颜色是有优先级的，根据对操作系统默认样式的观察，当处于选中状态+悬停状态的时候，默认取悬停状态，也就是鼠标移动到选中的列表item上，颜色取悬停状态颜色。而Qt中如果两种颜色都设置了，根据设置的顺序来，取最后的为准，如果最后设置的选中状态颜色，则当item处于选中状态+悬停状态的时候，取选中状态颜色而不是悬停状态颜色，切记！
+```cpp
+//下面这样设置则当鼠标停留在选中的item上时背景颜色=#00FF00
+QTableView::item:selected{background:#FF0000;}
+QTableView::item:hover{background:#00FF00;}
+
+//下面这样设置则当鼠标停留在选中的item上时背景颜色=#FF0000
+QTableView::item:hover{background:#00FF00;}
+QTableView::item:selected{background:#FF0000;}
+```
+
+226. qtc开发工具内置了不少的函数，可以很方便的进行一些判断和处理。
+```cpp
+//最小版本要求
+!minQtVersion(5, 15, 2) {
+    message("Cannot build Qt Installer Framework with Qt version $${QT_VERSION}.")
+    error("Use at least Qt 5.15.2.")
+}
+```
+
+227. 有时候文本框中的内容过长，而文本框默认光标在尾部，所以要主动设置下将光标移到最前面
+```cpp
+//三种方法都可以
+ui->lineEdit->setSelection(0, 0);
+ui->lineEdit->setCursorPosition(0);
+//样式表方式
+"QLineEdit{qproperty-cursorPosition:0;}
+```
+
+228. 关于Qt浏览器模块的几点说明。
+- Qt5.6以前用的是webkit，Qt5.6版本以后分两种情况，一种是mingw编译器（windows系统）对应的Qt库不再提供浏览器模块。
+- Qt5.6以后的版本在linux系统和mac等系统，都不存在没有浏览器控件的情况，都使用的是webengine。
+- 仅仅是windows上的mingw编译器的Qt版本没有，其他系统其实都有的。很多人在这个地方都有疑问，都以为只有msvc编译器有浏览器控件，其实确切的说是在windows上msvc的Qt库带浏览器控件。
+- 安装Qt的时候webengine模块默认不勾选，需要主动勾选才会安装。
+- 也不是所有的msvc的Qt版本都有webengine浏览器模块，哪怕你勾选了也没用，有些版本官方并没有编译，需要自行编译。需要到对应的Qt安装目录查看是否有 Qt5WebEngine.dll 文件。
+- 如果仅仅是为了弥补mingw版本缺失浏览器模块的遗憾，推荐用miniblink。
+- 如果为了统一兼容各种版本和系统，推荐用cef。
+- 如果没有历史包袱，推荐用webengine，与Qt的集成度高。
+- webkit和miniblink默认都不支持gpu，webengine默认走gpu。
+- qwebengine默认不支持MP4，需要自己重新编译。
+
+229. 关于编译数据库插件的几个经验总结。
+- 安装对应的数据库，安装后会有include头文件和lib链接库文件，这是基本的前提，编译数据库插件必须要有这两个东西。务必注意，32位的Qt必须安装32位的数据库才能正常编译成功，位数要一致。
+- 准备好数据库插件源码，比如qt-everywhere-src-5.14.2\qtbase\src\plugins\sqldrivers\mysql，可以在安装Qt的时候勾选src，或者后期直接官网重新下载源码解压出来。
+- 打开你要编译的数据库插件源码，比如mysql就打开mysql.pro，oracle就打开oci.pro。
+- 在pro中注释掉一行 #QMAKE_USE += mysql，如果是oci项目则是#QMAKE_USE += oci。
+- qsqldriverbase.pri文件中注释掉 #include(..shadowed(..PWD)/qtsqldrivers-config.pri)。
+- mysql.pro文件内容下面加上如下代码。
+```cpp
+path = C:/Qt/mysql-5.7.30-winx64
+INCLUDEPATH += $$path/include
+win32:LIBS += -L$$path/lib -llibmysql
+```
+- oci.pro文件内容下面加上如下代码。
+```cpp
+path = C:/app/Administrator/product/11.2.0/client_1
+INCLUDEPATH += $$path/oci/include
+win32:LIBS += -L$$path/oci/lib/msvc -loci
+```
+- psql.pro文件内容下面加上如下代码。
+```cpp
+path = "C:/Program Files/PostgreSQL/13"
+INCLUDEPATH += $$path/include
+win32:LIBS += -L$$path/lib -llibpq
+```
+- 以上写法同时支持mingw和msvc，其他系统编译过程也是类似。编译完成后默认会在你当前源码所在盘符的根目录下，会出现plugins目录，里面sqldrivers目录下就是对应编译生成好的插件动态库。
+- 默认oracle的插件驱动代码是按照oracle12的函数写的，如果链接的是oracle11，则需要改动两行代码才能编译成功。打开qsql_oci.cpp文件大概在1559行代码左右，有个OCIBindByPos2函数改成OCIBindByPos，下面还有一行bindColumn.lengths改成(ub2*)bindColumn.lengths。
+
+230. 关于Qt数据库的一些冷知识。
+- Qt即支持库的形式直接和数据库通信，也支持ODBC数据源的形式和各种数据库通信，这样就涵盖了所有的情况。
+- Qt数据库程序打包发布，所有前提：注意区分32/64位，你的程序是32位的就必须带上32位的库，64位的必须带上64位的库，这点Qt的库也是这个要求。mysql发布最简单，带上一个mysql的动态库文件就行（windows上的是libmysql.dll），非常简单。sqlserver不用带，因为是微软的亲儿子，一般操作系统自带。postgres需要带上libpq.dll、libintl-8.dll、libiconv-2.dll、libeay32.dll、ssleay32.dll这几个文件就行。oracle需要带上oci.dll、oraociei11.dll（这个文件很大有130MB+），如果不行建议直接安装个oracle client客户端软件，然后对应bin目录设置到环境变量就好。
+- 打包发布后测试下来，发现32位的程序也可以正常连接64位的mysql，64位的程序也可以正常连接32位的mysql，因此判断只要和程序的库的位数一致就行（编译的时候也是这个规则，32位的Qt程序编译数据库插件也要用32位的数据库链接库。），不需要和具体的数据库的位数一致，测试过mysql、sqlserver、postgresql数据库都是类似规则。
+- 大量测试对比下来，通过odbc数据源的方式和直连数据库的方式批量插入大量数据记录，直连方式速度更快，约5%左右，所以建议尽量采用此方式，是在没有此方式的环境才采用odbc数据源的方式，Qt默认自带odbc数据库插件。
+- mysql、postgresql数据库在执行sql脚本的时候，会自动将表名和字段名全部转成小写，oracle全部转成大写，这就导致使用QSqlTableModel调用setTable设置数据库表名的时候，一定要和数据库中的表名一致，区分大小写，mysql数据库默认配置设置的不区分大小写所以没有这个问题，所以就是在对postgresql和oracle数据库的时候一定要注意，本人就是在这里卡了很久，差点要把这巨大的屎盆扣在Qt的BUG上。
+```cpp
+void DbHelper::bindTable(const QString &dbType, QSqlTableModel *model, const QString &table)
+{
+    //postgresql全部小写,oracle全部大写,这两个数据库严格区分表名字段名的大小写卧槽
+    QString flag = dbType.toUpper();
+    if (flag == "POSTGRESQL") {
+        model->setTable(table.toLower());
+    } else if (flag == "ORACLE") {
+        model->setTable(table.toUpper());
+    } else {
+        model->setTable(table);
+    }
+}
+```
+- Qt支持不指定数据库名打开数据库，因为有时候是要在连接数据库服务器后，执行sql语句创建数据库。数据库都还没存在怎么连接呢，测试发现sqlite、mysql、sqlserver都支持这个特性。
+```cpp
+QSqlDatabase database = QSqlDatabase::addDatabase("QMYSQL");
+//database.setDatabaseName("iotsystem");
+database.setHostName("127.0.0.1");
+database.setPort(3306);
+database.setUserName("root");
+database.setPassword("root");
+qDebug() << TIMEMS << database.open() << database.lastError().text();
+QString sql = "CREATE DATABASE iotsystem";
+QSqlQuery query(database);
+query.exec(sql);
+```
+
+### 24：231-240
+
+## 2 升级到Qt6
+### 00：直观总结
 1. 增加了很多轮子，同时原有模块拆分的也更细致，估计为了方便拓展个管理。
 2. 把一些过度封装的东西移除了（比如同样的功能有多个函数），保证了只有一个函数执行该功能。
 3. 把一些Qt5中兼容Qt4的方法废弃了，必须用Qt5中对应的新的函数。
@@ -2420,10 +3230,10 @@ void frmSimple::initTableWidget()
 6. 有参数类型的变化，比如 long * 到 qintptr * 等，更加适应后续的拓展以及同时对32 64位不同系统的兼容。
 7. 源码中的double数据类型全部换成了qreal，和Qt内部数据类型高度一致和统一。
 8. 我测试的都是QWidget部分，quick部分没有测试，估计quick部分更新可能会更多。
-9. 强烈建议暂时不要用Qt6.0到Qt6.2之间的版本，一些模块还缺失，相对来说BUG也比较多，推荐6.2版本开始正式迁移。
+9. 强烈建议暂时不要用Qt6.0到Qt6.2之间的版本，一些模块还缺失，相对来说BUG也比较多，推荐6.2.2版本开始正式迁移。
 
-#### 2.2 经验总结
-1. 万能方法：安装5.15版本，定位到报错的函数，切换到源码头文件，可以看到对应提示字样 QT_DEPRECATED_X("Use sizeInBytes") 和新函数。按照这个提示类修改就没错，一些函数是从Qt5.7 5.9 5.10等版本新增加的，可能你的项目还用的Qt4的方法，但是Qt6以前都兼容这些旧方法，到了Qt6就彻底需要用新方法了。
+### 01：01-10
+1. 万能方法：安装5.15版本，定位到报错的函数，切换到源码头文件，可以看到对应提示字样 QT_DEPRECATED_X("Use sizeInBytes") 和新函数。按照这个提示类修改就没错，一些函数是从Qt5.7 5.9 5.10等版本新增加的，可能你的项目还用的Qt4的方法，但是Qt6以前都兼容这些旧方法，到了Qt6就彻底需要用新方法了。**PS：如果本身就是Qt6新增的功能函数则此方法无效**
 
 2. Qt6对core这个核心类进行了拆分，多出来core5compat，因此你需要在pro增加对应的模块已经代码中引入对应的头文件。
 ```cpp
@@ -2461,6 +3271,7 @@ greaterThan(QT_MAJOR_VERSION, 5): QT += core5compat
 
 10. qlayout中的 margin() 函数换成 contentsMargins().left()，查看源码得知以前的 margin() 返回的就是 contentsMargins().left()，在四个数值一样的时候，默认四个数值就是一样。类似的还有setMargin移除了，统统用setContentsMargins。
 
+### 02：11-20
 11. 之前 QChar c = 0xf105 全部要改成强制转换 QChar c = (QChar)0xf105，不再有隐式转换，不然编译报错提示error: conversion from 'int' to 'QChar' is ambiguous 。
 
 12. qSort等一些函数用回c++的 std::sort 。
@@ -2585,6 +3396,7 @@ int steps = degrees / 15;
 
 20. qVariantValue 改成 qvariant_cast ，qVariantSetValue(v, value) 改成了 v.setValue(val)。相当于退回到最原始的方法，查看qVariantValue源码封装的就是qvariant_cast。
 
+### 03：21-30
 21. QStyleOption的init改成了initFrom。
 
 22. QVariant::Type 换成了 QMetaType::Type ，本身以前的 QVariant::Type 封装的就是 QMetaType::Type 。
@@ -2605,15 +3417,21 @@ int steps = degrees / 15;
 
 30. QLabel的 pixmap 函数之前是指针 *pixmap() 现在换成了引用 pixmap()。
 
+### 04：31-40
 31. QTableWidget的 sortByColumn 方法移除了默认升序的方法，必须要填入第二个参数表示升序还是降序。
 
-32. qtnetwork中的错误信号error换成了errorOccurred。
+32. qtnetwork模块中（TCP/UDP相关的socket）的错误信号error换成了errorOccurred，就改了个名字，注意websocket那块居然没统一改过来依然是叫error。
 ```cpp
 #if (QT_VERSION >= QT_VERSION_CHECK(6,0,0))
+    connect(udpSocket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this, SLOT(error()));
     connect(tcpSocket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this, SLOT(error()));
 #else
+    connect(udpSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error()));
     connect(tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error()));
 #endif
+
+//特别注意websocket中依然还是用error
+connect(webSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error()));
 ```
 
 33. XmlPatterns模块木有了，全部用xml模块重新解析。
@@ -2682,14 +3500,309 @@ MainWindow(QWidget *parent = nullptr);
 //Qt高版本兼容低版本写法比如Qt5/6都支持 *parent = 0 这种写法。
 ```
 
-### 三、酷码专区
-**酷码大佬（微信Kuma-NPC）**
-1. 关于Qt事件传递的一个说明：
-- 通常写win32程序，鼠标消息应该是直接发给指定窗口句柄的，指定窗口没有处理就会转化成透传消息，交给父窗口处理。你在一个普通文字label上点击，父窗口也能收到鼠标事件。
-- Qt应该是所有消息都发给了顶层窗口，所以事件分发逻辑是自己处理，主窗口收到鼠标事件然后Qt自己分发给指定子控件，QEvent会有ignore或者accept表示自己处理了没有，例如鼠标点击事件，事件分发器发现没有被处理，数据重新计算然后分发给父窗口。这样父窗口收到的事件坐标就是基于自己窗口内的。用eventFilter就需要自己计算坐标。
-- 再比如，当使用QDialog，放一个QLineEdit并设置焦点，按Esc时QDialog也会自动关闭，本质上就是因为QLineEdit并不处理Esc的按键事件，透传给了QDialog。
+40. 对于委托的进度条样式QStyleOptionProgressBar类的属性，在Qt4的时候不能设置横向还是垂直样式，默认横向样式，要设置orientation需要用另外的QStyleOptionProgressBarV2。从Qt5开始新增了orientation和bottomToTop属性设置。在Qt6的时候彻底移除了orientation属性，只有bottomToTop属性，而且默认进度是垂直的，很操蛋，理论上默认应该是横向的才对，绝大部分进度条场景都是横向的。这个时候怎么办呢，原来现在的处理逻辑改了，默认垂直的，如果要设置横向的直接设置 styleOption.state |= QStyle::State_Horizontal 这种方式设置才行，而Qt6以前默认方向是通过 orientation 值取得，这个State_Horizontal从Qt4就一直有，Qt6以后要主动设置下才是横向的就是。
 
-### 四、Qt设计模式
+### 05：41-50
+41. Qt6.2版本开始增加了对多媒体模块的支持，但是在mingw编译器下还是有问题，直到6.2.2才修复这个问题，官网解释是因为mingw编译器版本不支持，到6.2.2采用了新的mingw900_64，这个编译器版本才支持。所以理论上推荐从6.2.2开始使用新的Qt6。
+
+42. QTextStream中的setCodec方法改成了setEncoding，参数变了，功能更强大。
+```cpp
+QTextStream stream(&file);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
+stream.setCodec("utf-8");
+stream.setCodec("gbk");
+#else
+stream.setEncoding(QStringConverter::Utf8);
+stream.setEncoding(QStringConverter::System);
+#endif
+```
+
+43. QModelIndex的查找子节点child函数去掉了，但是查找父节点parent函数保留，查阅代码得知之前的child函数就是封装的model->index(row, column, QModelIndex)函数。
+```cpp
+//下面两个函数等价 如果要兼容Qt456则用下面这个方法
+QModelIndex index = indexParent.child(i, 0);
+QModelIndex index = model->index(i, 0, indexParent);
+
+//下面两个函数等价 如果要兼容Qt456则用下面这个方法
+QModelIndex indexChild = index.child(i, 0);
+QModelIndex indexChild = model->index(i, 0, index);
+```
+
+44. 之前QPixmap类中的静态函数grabWindow和grabWidget彻底废弃了，改成了用QApplication::primaryScreen()->grabWindow，其实这个从Qt5开始就建议用这个。
+```cpp
+#if (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
+    QPixmap pixmap = QApplication::primaryScreen()->grabWindow(widget->winId());
+#else
+    QPixmap pixmap = QPixmap::grabWidget(widget->winId());
+#endif
+```
+
+## 3 Qt安卓经验
+### 01：01-05
+1. pro中引入安卓拓展模块 QT += androidextras 。
+2. pro中指定安卓打包目录 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android 指定引入安卓特定目录比如程序图标、变量、颜色、java代码文件、jar库文件等。
+- AndroidManifest.xml 每个程序唯一的一个全局配置文件，里面xml格式的数据，标明支持的安卓版本、图标位置、横屏竖屏、权限等。这个文件是最关键的，如果没有这个文件则Qt会默认生成一个。
+- android/res/drawable-hdpi drawable-xxxhdpi 等目录下存放的是应用程序图标。
+- android/res/layout 目录下存放的布局文件。
+- android/res/values/libs.xml 存储的一些变量值。
+- android/libs 目录下存放的jar库文件。
+- android/src 目录下存放的java代码文件，可以是根据包名建立的一层层子目录，也可以直接在src目录下。
+- 其他目录自行搜索安卓目录规范。
+- 后面的说明统一用的android目录举例，其实你可以改成任意目录，比如你的代码目录下是xxoo存放的安卓相关的打包文件，你就写成 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/xxoo 。
+
+3. java类名必须和文件名完全一致，区分大小写。
+4. java类必须在android/src目录下不然不会打包到apk文件，可以是子目录比如 android/src/com/qt 。
+5. Qt代码中的QAndroidJniObject指定传入的java包名，必须严格和java文件package完全一致，不然程序执行到此处会因为找不到而崩溃。
+- android/scr/MainActivity.java 顶部 没有 package 则代码中必须是 QAndroidJniObject javaClass("MainActivity");
+- android/scr/MainActivity.java 顶部 package com.qandroid; 则代码中必须是 QAndroidJniObject javaClass("com/qandroid/MainActivity");
+- android/scr/com/example/MainActivity.java 顶部 package com.qandroid; 则代码中必须是 QAndroidJniObject javaClass("com/qandroid/MainActivity");
+- android/scr/com/example/MainActivity.java 顶部 package com.example.qandroid; 则代码中必须是 QAndroidJniObject javaClass("com/qandroid/example/MainActivity");
+- 总之这个包名是和代码中的package后面一段吻合，而不是目录路径。为了统一管理方便查找文件，建议包名和目录路径一致。
+
+### 02：06-10
+6. Qt只能干Qt内部类的事情，做一些简单的UI交互还是非常方便，如果涉及到底层操作，还是需要熟悉java会如虎添翼，一般的做法就是写好java文件调试好，提供静态方法给Qt调用，这样通过QAndroidJniObject这个万能胶水可以做到Qt程序调用java中的函数并拿到执行结果，也可以接收java中的函数。
+7. pro中通过 OTHER_FILES += android/AndroidManifest.xml OTHER_FILES += android/src/JniMessenger.java 引入文件其实对整个程序的编译打包没有任何影响，就是为了方便在QtCreator中查看和编辑。
+8. 在Qt中与安卓的java文件交互都是用万能的QAndroidJniObject，可以执行java类中的普通函数、静态函数，可以传类对象jclass、类名className、方法methodName、参数，也可以拿到执行结果返回值。 (I)V括号中的是参数类型，括号后面的是返回值类型，void返回值对应V，由于String在java中不是数据类型而是类，所以要用Ljava/lang/String;表示，其他类作为参数也是这样处理。
+- 调用实例方法：callMethod、callObjectMethod。
+- 调用静态方法：callStaticMethod、callStaticObjectMethod。
+- 不带Object的函数名用来执行无返回值或者常规返回值int、float等的方法。
+- 如果返回值是String或者类则需要用带Object的函数名来执行，返回QAndroidJniObject类型再转换处理拿到结果，比如toString拿到字符串。
+
+9. 各种参数和返回值示例。
+```java
+package org.qt;
+import org.qt.QtAndroidData;
+
+public class QtAndroidTest
+{
+    //需要通过实例来调用 测试发现不论 private public 或者不写都可以调用 我擦
+    private void printText()
+    {
+        System.out.println("printText");
+    }
+
+    public static void printMsg()
+    {
+        System.out.println("printMsg");
+    }
+
+    public static void printValue(int value)
+    {
+        System.out.println("printValue:" + value);
+    }
+
+    public static void setValue(float value1, double value2, char value3)
+    {
+        System.out.println("value1:" + value1 + " value2:" + value2 + " value3:" + value3);
+    }
+
+    public static int getValue()
+    {
+        return 65536;
+    }
+
+    public static int getValue(int value)
+    {
+        return value + 1;
+    }
+
+    public static void setMsg(String message)
+    {
+        System.out.println("setMsg:" + message);
+    }
+
+    public static String getMsg()
+    {
+        return "hello from java";
+    }
+
+    public static void setText(int value1, float value2, boolean value3, String message)
+    {
+        System.out.println("value1:" + value1 + " value2:" + value2 + " value3:" + value3 + " message:" + message);
+    }
+
+    public static String getText(int value1, float value2, boolean value3, String message)
+    {
+        //同时演示触发静态函数发给Qt
+        QtAndroidData.receiveData("message", "你好啊 java");
+
+        //下面两种办法都可以拼字符串
+        return "value1:" + value1 + " value2:" + value2 + " value3:" + value3 + " message:" + message;
+        //return "value1:" + String.valueOf(value1) + " value2:" + String.valueOf(value2) + " value3:" + String.valueOf(value3) + " message:" + message;
+    }
+}
+```
+
+```cpp
+#include "androidtest.h"
+
+//java类对应的包名+类名
+#define className "org/qt/QtAndroidTest"
+
+void AndroidTest::test()
+{
+    jint a = 12;
+    jint b = 4;
+    //可以直接调用java内置类中的方法
+    jint max = QAndroidJniObject::callStaticMethod<jint>("java/lang/Math", "max", "(II)I", a, b);
+
+    //jclass javaMathClass = "java/lang/Math";
+    jdouble value = QAndroidJniObject::callStaticMethod<jdouble>("java/lang/Math", "random");
+
+    qDebug() << "111" << max << value;
+}
+
+void AndroidTest::printText()
+{
+    QAndroidJniEnvironment env;
+    jclass clazz = env.findClass(className);
+    QAndroidJniObject obj(clazz);
+    obj.callMethod<void>("printText");
+}
+
+void AndroidTest::printMsg()
+{
+#if 0
+    //查看源码得知不传入jclass类的函数中内部会自动根据类名查找jclass
+    QAndroidJniEnvironment env;
+    jclass clazz = env.findClass(className);
+    QAndroidJniObject::callStaticMethod<void>(clazz, "printMsg");
+#else
+    //没有参数和返回值可以忽略第三个参数
+    QAndroidJniObject::callStaticMethod<void>(className, "printMsg");
+    //QAndroidJniObject::callStaticMethod<void>(classNameTest, "printMsg", "()V");
+#endif
+}
+
+void AndroidTest::printValue(int value)
+{
+    QAndroidJniObject::callStaticMethod<jint>(className, "printValue", "(I)I", (jint)value);
+}
+
+void AndroidTest::setValue(float value1, double value2, char value3)
+{
+    QAndroidJniObject::callStaticMethod<void>(className, "setValue", "(FDC)V", (jfloat)value1, (jdouble)value2, (jchar)value3);
+}
+
+int AndroidTest::getValue(int value)
+{
+    //java类中有两个 getValue 函数 一个需要传参数
+    //jint result = QAndroidJniObject::callStaticMethod<jint>(className, "getValue");
+    jint result = QAndroidJniObject::callStaticMethod<jint>(className, "getValue", "(I)I", (jint)value);
+    return result;
+}
+
+void AndroidTest::setMsg(const QString &msg)
+{
+    QAndroidJniObject jmsg = QAndroidJniObject::fromString(msg);
+    QAndroidJniObject::callStaticMethod<void>(className, "setMsg", "(Ljava/lang/String;)V", jmsg.object<jstring>());
+}
+
+QString AndroidTest::getMsg()
+{
+    QAndroidJniObject result = QAndroidJniObject::callStaticObjectMethod(className, "getMsg", "()Ljava/lang/String;");
+    return result.toString();
+}
+
+void AndroidTest::setText(int value1, float value2, bool value3, const QString &msg)
+{
+    QAndroidJniObject jmsg = QAndroidJniObject::fromString(msg);
+    QAndroidJniObject::callStaticMethod<void>(className, "setText", "(IFZLjava/lang/String;)V", (jint)value1, (jfloat)value2, (jboolean)value3, jmsg.object<jstring>());
+}
+
+QString AndroidTest::getText(int value1, float value2, bool value3, const QString &msg)
+{
+    QAndroidJniObject jmsg = QAndroidJniObject::fromString(msg);
+    QAndroidJniObject result = QAndroidJniObject::callStaticObjectMethod(className, "getText", "(IFZLjava/lang/String;)Ljava/lang/String;", (jint)value1, (jfloat)value2, (jboolean)value3, jmsg.object<jstring>());
+    return result.toString();
+}
+```
+
+10. 在原生Android开发中，不同页面会定义不同的Activity。但使用Qt Quick、Flutter等采用Direct UI方式实现的第三方开发框架则只定义了一个Activity。里面不同页面实际都是使用OpenGL等直接绘制的。https://blog.csdn.net/LCSENs/article/details/100182235
+
+### 03：11-15
+11. 安卓中一个界面窗体对应一个Activity，多个界面就有多个Activity，而在Qt安卓程序中，Qt这边只有一个Activity那就是QtActivity（包名全路径 org.qtproject.qt5.android.bindings.QtActivity），这个QtActivity是固定的写好的，整个Qt程序都是在这个QtActivity界面中。你打开AndroidManifest.xml文件可以看到对应节点有个name=org.qtproject.qt5.android.bindings.QtActivity，所以如果要让Qt程序能够更方便通畅的与对应的java类进行交互（需要上下文传递Activity的，比如震动，消息提示等），建议新建一个java类，继承自QtActivity即可，这样相当于默认Qt启动的就是你java类中定义的Activity，可以很好的控制和交互。
+
+12. 由于AndroidManifest.xml文件每个程序都可能不一样，为了做成通用的组件，这就要求可能不能带上AndroidManifest.xml文件，这样的话每个Qt安卓程序都启动默认内置的Activity，如果依赖Activity上下文的执行函数需要传入Qt的Activity才行，这里切记Qt的Activity包名是 Lorg/qtproject/qt5/android/bindings/QtActivity; 之前顺手想当然的写的 Landroid/app/Activity; 发现死活不行，原来是包名错了。
+
+13. 一个Qt安卓程序中可以有多个Java类，包括继承自Activity的类（这样的Activity可以通过QtAndroid::startActivity函数来调用），但是只能有一个通过AndroidManifest.xml文件指定的Activity，不指定会默认一个。如果java类中不需要拿到Qt的Activity进行处理的，可以不需要继承任何Activity，比如全部是运算的静态函数。
+
+14. 在java类中如果上面没有主动引入包名，则下面需要写全路径，引入了则不需要全路径可以直接用（包括枚举值都可以直接写，比如 VIBRATOR_SERVICE 这种枚举值引入了包名后不需要写android.content.Context.VIBRATOR_SERVICE），建议引入包名，比如上面写了 import org.qtproject.qt5.android.bindings.QtActivity; 则下面继承类可以直接写 public class QtAndroidActivity extends QtActivity，如果没有引入则需要写成 public class QtAndroidActivity extends org.qtproject.qt5.android.bindings.QtActivity 。
+
+15. 建议搭配 android studio 工具开发，因为在 android studio 中写代码都有自动语法提示，包名会提示自动引入，可以查看有那些函数方法等，还可以校验代码是否正确，而如果在QtCreator中手写有时候可能会写错，尤其是某个字母写错，当然这种错误是编译通不过的，会提示错误在哪行。
+
+### 04：16-20
+16. 用Qt做安卓开发最大难点两个，第一个就是传参数这些奇奇怪怪的字符（Ljava/lang/String;）啥意思，如何对应，这也不是Qt故意为难初学者啥的，因为这套定义机制是安卓系统底层要求的，系统层面定义的一套规范，其实这个在帮助文档中写的很清楚，都有数据类型对照表，用熟悉了几次就很简单了。第二个难点就是用java写对应的类，如果是会安卓开发的人来说那不要太简单，尤其是搜索那么方便一大堆，没有搞过安卓开发的人来说就需要学习下，这个没有捷径，只是希望Qt能够尽可能最大化的封装一些可以直接使用的类，比如后期版本就提供了权限申请的类 QtAndroid::requestPermissionsSync 之类的，用起来就非常的爽，不用自己写个java类调来调去的。
+
+17. 理论上来说按照Qt提供的万能大法类QAndroidJniObject，可以不用写java类也能执行各种处理，拿到安卓库中的属性和执行方法，就是写起来太绕太费劲，在java类中一行代码，这里起码三行，所以终极大法就是熟悉安卓开发，直接封装好java类进行调用。
+
+18. 测试发现GetStringUTFChars方法对应的数据字符串中不能带有temp字样，否则解析有问题，不知什么原因。
+
+19. 数据类型参数和返回值类型必须完全一致，否则执行会提示找不到对应的函数，有返回值一定要写上返回值。
+
+20. jar文件对包名的命名没有要求，只要放在android/libs目录下即可，安卓底层是通过包名去查找，而不是通过文件名，你甚至可以将原来的包名重新改成也可以正常使用，比如classes.jar改成test.jar也能正常使用。
+
+### 05：21-25
+21. 关于权限设置，在早期的安卓版本，所有权限都写在全局配置文件AndroidManifest.xml中，这种叫安装时权限，就是安装的时候告诉安卓系统当前app需要哪些权限。大概从安卓6开始，部分权限需要动态申请，这种叫动态权限，这种申请到的权限也可以动态撤销，就是要求程序再次执行代码去向系统申请权限，比如拍照、存储读写等。也不是所有的权限都改成了动态申请，意味着兼容安卓6以上的系统你既要在AndroidManifest.xml中写上要求的权限，也要通过checkPermission申请你需要的权限。
+
+22. android studio 新建并生产jar包步骤。
+- 第一步：文件（File）-》新建（new）-》项目（new project）-》空白窗体（empty activity）。
+- 第二步：刚才新建好的项目鼠标右键新建（new）-》模块（new module）-》安卓库（android library）。
+- 说明：如果选择的不是安卓库（android library）而是java库（Java Library），则直接编译出来的就是jar文件，默认包名 com.example.lib.MyClass。推荐选择java库，编译后不用去一堆文件中找jar文件。
+- 第三步：写好库名字，根据项目需要选择好最低sdk版本-》完成。
+- 第四步：在刚才新建好的库项目mylibrary，依次找到子节点src/main/java/com.example.mylibrary上鼠标右键新建-》class类。切记是这个节点不是java节点或者其他节点。
+- 第五步：写好你的类方法函数等。
+```cpp
+package com.example.mylibrary;
+public class Test {
+    public static int add(int a, int b) {
+        return a + b;
+    }
+}
+```
+- 第六步：选中库项目mylibrary，菜单执行编译（build）-》编译库（make module xxx）。
+- 第七步：此时在mylibrary/build目录下有outputs目录和intermediates目录，其中outputs/aar目录下是生成的Android库项目的二进制归档文件，包含所有资源，class以及res资源文件全部包含。有时候我们仅仅需要jar文件，只包含了class文件与清单文件 ，不包含资源文件，如图片等所有res中的文件。需要到intermediates/aar_main_jar/debug目录下，可以看到classes.jar，将这个拷贝出来使用即可。当然你也可以对刚才的aar文件用解压缩软件解压出来也能看到classes.jar，是同一个文件。
+- 其他：调用jar包非常简单，只需要将jar文件放在你的项目的libs目录下即可，对应的包名和函数一般jar包提供者会提供，没有提供的话，可以在android studio中新建空白项目，切换到project视图，找到libs目录，鼠标右键最下面作为包动态库添加到项目，导入包完成以后会自动在libs目录列出，双击刚刚导入的包然后就自动列出对应的类和函数。
+
+23. Qt安卓使用jar包步骤。
+- 第一步：将classes.jar放到android/libs目录下，为啥是这个目录？因为这是安卓的规则约定，这个目录就是放库文件，放在这个目录下的文件会自动打包编译到apk文件中。
+- 第二步：调用jar文件之前，前提是你知道jar文件中的函数详细信息，这个一般jar提供者会提供好手册，如果代码没有混肴的话，你可以在android studio中双击打开查阅具体的函数。
+- 第三步：如果jar文件中的函数简单，直接拿到结果不需要绕来绕去，可以直接写Qt类来调用；如果还是很复杂，建议再去新建java类处理完再交给Qt，当然也可以让jar的作者尽可能封装函数的时候就做好，尽量提供最简单的接口返回需要的数据。比如返回图片数据可以做成jar内部存储好图片，然后返回图片路径即可，不然有些数据转换也挺烦。
+- 第四步：编写最终的调用函数。
+```cpp
+int AndroidJar::add(int a, int b)
+{
+#ifdef Q_OS_ANDROID
+    const char *className = "com/example/mylibrary/Test";
+    jint result = QAndroidJniObject::callStaticMethod<jint>(className, "add", "(II)I", (jint)a, (jint)b);
+    return result;
+#endif
+}
+```
+
+24. Qt6中对安卓支持部分做了大的改动，目前还不完善，如果是不涉及到与java交互的纯Qt项目，可以正常移植，涉及到的暂时不建议移植到Qt6，等所有类完善了再说。
+- 移除了安卓插件androidextras，将其中部分功能类移到core模块中，不需要额外引入。
+- 类名发生了变化，比如QAndroidJniObject改成了QJniObject、QAndroidJniEnvironment改成了QJniEnvironment，可能是为了统一移动开发平台类，弱化安卓的影响。
+- 对应的安卓jdk要用jdk11而不是jdk1.8，Qt5.15两个都支持，建议就统一用jdk11。
+- 对应封装的java类包名去掉了qt5标识，org.qtproject.qt5.android.bindings.QtActivity改成了org.qtproject.qt.android.bindings.QtActivity、org.qtproject.qt5.android.bindings.QtApplication改成了org.qtproject.qt.android.bindings.QtApplication。
+- 对安卓最低sdk有要求，所以建议在配置AndroidManifest.xml文件的时候不要带上最低版本要求。
+- 对AndroidManifest.xml文件内容有要求，之前Qt5安卓的不能在Qt6安卓下使用，具体内容参见示例下的文件。
+- 对应示例demo在 C:\Qt\Examples\Qt-6.3.0\corelib\platform 目录下，之前是 C:\Qt\Examples\Qt-5.15.2\androidextras ，目前就一个示例，可能因为其他类还没有移植好。
+
+25. 如果想要安卓全屏遮挡住顶部状态栏，可以在main函数中将show改成showFullScreen即可，当然也可以采用java的方式在onCreate函数中加一行 getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+### 06：25-30
+26. 横竖屏切换的识别，在Qt中会同时反映到resizeEvent事件中，你可以在这个是尺寸变化后读取下当前屏幕是横屏还是竖屏，然后界面上做出调整，比如上下排列改成左右排列。
+
+27. 由于不同Qt版本对应的安卓配置文件 AndroidManifest.xml 内容格式不一样，高版本和低版本模板格式互不兼容，所以建议使用自己的Qt版本创建的 AndroidManifest.xml 文件，创建好以后如果使用的是自己重新定义的java文件的启动窗体则需要将 AndroidManifest.xml 文件中的 android:name="org.qtproject.qt5.android.bindings.QtActivity" 换掉就行。
+
+28. 如果自己用android studio编译的jar文件放到Qt项目的libs目录下，导致编译通不过，提示 com.android.dx.cf.iface.ParseException: bad class file magic 之类的，那是因为jdk版本不一致导致的，你可能需要在android studio项目中找到模块编jdk版本设置的地方降低版本，比如你用的ndk是r14，则需要选择jdk1.6或者jdk1.7。一般来说高版本兼容低版本，因为ndk版本太低无法兼容jdk1.8。后面发现如果直接新建的是java库（Java Library）则不存在这个问题，如果选择的是安卓库（android library）就可能有这个问题。
+
+29. 安卓项目配置文件是固定的名字 AndroidManifest.xml ，改成其他名字就不认识，不要想当然改成其他名字导致无法正常识别。
+
+30. AndroidManifest.xml文件中的package="org.qtproject.example"是包名，也是整个apk程序的内部唯一标识，如果多个apk这个包名一样，则会覆盖，所以一定要注意不同的程序记得把这个包名改成你自己的。这个包名也决定了java文件中需要使用资源文件时候的引入包名 import org.qtproject.example.R; 如果包名不一样则编译都通不过。
+
+## 4 Qt设计模式
 **读《c++ Qt设计模式》书籍整理的一点经验。此书和官方的《C++ GUI Qt4编程》一起的。**
 1. 通常而言，好的做法是在包含了Qt头文件之后再包含非Qt头文件，由于Qt（为编译器和预处理器）定义了许多符号，这使得避免名称冲突变得更容易，也更容易找到文件。
 ```cpp
@@ -2719,36 +3832,64 @@ for (int i = 0; i < count; ++i) {
 
 3. 内存管理使程序员获得了强大的能力，但是，“权力越大，责任越大”。
 4. 只要有可能，就应当使用列表而不是数组，比如应该使用 QList<int> 代替 int [] ，在c++中数组被看成是“邪恶的”。
-5. 
 
-### 五、其他经验
+5. 在利用Qt编写程序的过程中，因为Qt的父子所有权继承关系，很少会用到智能指针，因为需要调用delete的情况很少。任何时候只要我们需要调用delete，或者是需要将某个指针设定为0时，应该考虑使用一个智能指针。
+
+6. 实际上，我们不能完全确定使用多线程就一定能够真正改善程序的性能，例如，如果增加使用线程的数量，使他与系统可用的内核数量成正比，这样做或许还会降低程序的性能，因为所获得的收益会因线程竞争的剧增而消失殆尽。有时候，单线程中最有效的算法在多线程中却不一定有效。因此，如果真的是想改进程序的性能，理想的做法是，使用不同的实现方法，并与他们的性能进行比较后加以分类，当然测试对比的前提是使用完全相同的硬件和软件配置环境。
+
+7. 在源代码中关于文件路径，使用 / 会更方便一些，因为无论是在何种平台上，Qt都能理解他，不需要对他进行转换。但是，当我们想为用户显示路径时，最好还是根据应用程序所在平台的正确形式来显示他。
+
+8. 当我们有很多项数据需要处理时，比如成千上万或者更多，那么为每个处理都创建一个线程可能导致大量的开销，这样来依次处理数据或许更快些。一种解决办法就是创建少量的辅助线程，并让每个线程只处理一组数据。
+
+9. 
+
+## 5 Qt大佬专区
+### 5.1 酷码大佬
+**微信：Kuma-NPC**
+1. 关于Qt事件传递的一个说明：
+- 通常写win32程序，鼠标消息应该是直接发给指定窗口句柄的，指定窗口没有处理就会转化成透传消息，交给父窗口处理。你在一个普通文字label上点击，父窗口也能收到鼠标事件。
+- Qt应该是所有消息都发给了顶层窗口，所以事件分发逻辑是自己处理，主窗口收到鼠标事件然后Qt自己分发给指定子控件，QEvent会有ignore或者accept表示自己处理了没有，例如鼠标点击事件，事件分发器发现没有被处理，数据重新计算然后分发给父窗口。这样父窗口收到的事件坐标就是基于自己窗口内的。用eventFilter就需要自己计算坐标。
+- 再比如，当使用QDialog，放一个QLineEdit并设置焦点，按Esc时QDialog也会自动关闭，本质上就是因为QLineEdit并不处理Esc的按键事件，透传给了QDialog。
+
+### 5.2 小豆君
+1. 无论你是学Qt，Java，Python或其它，都需要明白一个道理：摒弃掉你的好奇心，千万不要去追求第三方类或工具是怎么实现的，这往往会让你收效甚微，其实，你只需要熟练掌握它的接口，知道类的目的即可，不可犯面向过程的毛病，刨根问底。记住，你的目标是让其它工具为你服务，你要踩在巨人的肩膀上创造世界。
+
+2. Qt真正的核心：元对象系统、属性系统、对象模型、对象树、信号槽。往死里啃这五大特性，在你的项目中，逐渐的设法加入这些特性，多多练习使用它们，长此以往你会收获意想不到的效果。
+
+3. 一边请教别人，一边多多重构，其实编码这条路虽然有人给你指路，但真正走下去的是你自己，当你真正走完时，你的编码水平一定会有非常大的提升。也许别人1000行的代码，在你这里几十行就搞定了，这也正事Qt的魅力。
+
+4. 在阅读Qt的帮助文档时，要静下心来，不要放过每一句，记住在文档中没有废话，尤其是每段的开头。
+
+## 6 其他经验
 1. Qt界的中文乱码问题，版本众多导致的如何选择安装包问题，如何打包发布程序的问题，堪称Qt界的三座大山！
 
 2. 在Qt的学习过程中，学会查看对应类的头文件是一个好习惯，如果在该类的头文件没有找到对应的函数，可以去他的父类中找找，实在不行还有爷爷类，肯定能找到的。通过头文件你会发现很多函数接口其实Qt已经帮我们封装好了，有空还可以阅读下他的实现代码。
 
 3. Qt安装目录下的Examples目录下的例子，看完学完，月薪20K起步；Qt常用类的头文件的函数看完学完使用一遍并加以融会贯通，月薪30K起步。
 
-4. Qt在开发阶段不支持中文目录，切记，这是无数人可能犯的错误，在安装Qt集成开发环境以及编译器的时候，务必记得目录必须英文，Qt项目源码也必须是英文目录，否则很可能不正常，建议尽量用默认的安装位置。
+4. Qt在开发阶段不支持中文目录（运行阶段可以，比如打包发布的程序放到中文目录运行是ok的），切记，这是无数人可能犯的错误，在安装Qt集成开发环境以及编译器的时候，务必记得目录必须英文，Qt项目源码也必须是英文目录，否则很可能不正常，建议尽量用默认的安装位置。
 
 5. 如果出现崩溃和段错误，80%都是因为要么越界，要么未初始化，死扣这两点，80%的问题解决了。
 
-6. Qt一共有几百个版本，关于如何选择Qt版本的问题，我一般保留四个版本，为了兼容Qt4用4.8.7，最后的支持XP的版本5.7.0，最新的长期支持版本比如5.15，最高的新版本比如5.15.2。强烈不建议使用4.7以前和5.0到5.3之间的版本（Qt6.0到Qt6.2之间、不含6.2的版本也不建议，很多模块还没有集成），太多bug和坑，稳定性和兼容性相比于之后的版本相当差，能换就换，不能换睡服领导也要换。如果没有历史包袱建议用5.15.2，目前新推出的6.0版本也强烈不建议使用，官方还在整合当中，好多类和模块暂时没有整合，需要等到6.2版本再用。
+6. Qt一共有几百个版本，关于如何选择Qt版本的问题，我一般保留四个版本，为了兼容Qt4用4.8.7，最后的支持XP的版本5.7.0，最新的长期支持版本比如5.15，最高的新版本比如5.15.2。强烈不建议使用4.7以前和5.0到5.3之间的版本（Qt6.0到Qt6.2之间、不含6.2的版本也不建议，很多模块还没有集成），太多bug和坑，稳定性和兼容性相比于之后的版本相当差，能换就换，不能换睡服领导也要换。如果没有历史包袱建议用5.15.2，目前新推出的6.0版本也强烈不建议使用，官方还在整合当中，好多类和模块暂时没有整合，需要等到6.2.2版本再用。
 
-7. Qt和msvc编译器常见搭配是Qt5.7+VS2013、Qt5.9+VS2015、Qt5.12+VS2017、Qt5.15+VS2019、Qt6.2+VS2019，按照这些搭配来，基本上常用的模块都会有，比如webengine模块，如果选用的Qt5.12+msvc2015，则很可能官方没有编译这个模块，只是编译了Qt5.12+msvc2017的。
+7. Qt和msvc编译器常见搭配是Qt5.7+VS2013、Qt5.9+VS2015、Qt5.12+VS2017、Qt5.15+VS2019、Qt6.2+VS2019，按照这些搭配来，基本上常用的模块都会有，比如webengine模块，如果选用的Qt5.12+msvc2015，则很可能官方没有编译这个模块，只是编译了Qt5.12+msvc2017的，如果一定要用msvc2015不想换msvc2017则只能选择Qt5.9+msvc2015套件，或者自行源码重新编译（这个难度超大，初学者绕过）。
 
-8. Qt默认有对应VS版本，在下载对应VS插件的时候心里要有个数，官方默认提供的是原配的插件，如果想要Qt4.8+VS2015的插件，需要自行编译。一般来说是Qt4.8原配VS2010，Qt5.6原配VS2013，Qt5.9原配VS2015，Qt5.12原配VS2017，切记：原配最好。
+8. Qt默认有对应VS版本，在下载对应VS插件的时候心里要有个数，官方默认提供的是原配的插件，如果想要Qt4.8+VS2015的插件，需要自行编译。一般来说是Qt4.8原配VS2010，Qt5.6原配VS2013，Qt5.9原配VS2015，Qt5.12原配VS2017，Qt5.15原配VS2019，切记：原配最好。
 
-9. 新版本Qt安装包安装的时候需要填写注册信息，如果不想填写，先禁用网卡，在运行安装包，可以直接跳过这一步进行安装。
+9. 用Qt做开发机器建议用win10，尤其是2021年以后新发布的Qt版本，比如Qt5.12.12、Qt5.15.2、Qt6.2.2等，因为很可能自带的QtCreator用的最新的版本，Qt6开始不再支持win7，或者由于其他的原因，对win7的支持不友好，会出现奇奇怪怪的问题等，所以又是没得选必须用win10。建议各位拥抱新时代的变化，这世上唯一不变的只有变化。
 
-10. 终极秘籍：如果遇到问题搜索Qt方面找不到答案，试着将关键字用JAVA C# android打头，你会发现别有一番天地，其他人很可能做过！
+10. 新版本Qt安装包安装的时候需要填写注册信息，如果不想填写，先禁用网卡，在运行安装包，可以直接跳过这一步进行安装。**从Qt5.15开始不再提供离线安装包，意味着必须使用在线安装器安装Qt的后续版本，必须填写用户信息，没得选。**
 
-11. 如果Qt能从下面几个方面努力，相信会更有发展前景。
+11. 终极秘籍：如果遇到问题搜索Qt方面找不到答案，试着将关键字用JAVA C# android打头，你会发现别有一番天地，其他人其他语言其他领域很可能做过！
+
+12. 如果Qt能从下面几个方面努力，相信会更有发展前景。
 - QWidget支持CSS3，具有诸多的牛逼的效果，目前支持的是CSS2。
 - QWidget支持GPU绘制，可选切换CPU或者GPU，提升绘制效率，利用现在强大的硬件。
 - Qml无缝支持js，可以利用现在各种js轮子，指数级提升qml的项目范围。
 - 支持将程序转成web运行，比如转成cgi之类的程序，目前Qt for WebAssembly很鸡肋，功能极其有限，sql/network/本地访问等都不支持，首次加载速度超慢，大部分Qt类还不支持。
 
-12. 在Qt界始终有两大阵营产生激烈的纷争，那就是选用qml还是widget好，大量初学者也会问这个问题，有以下几点总结。
+13. Qt自从4.7以后引入的QML。从此以后，Qt开发就分成了两种流派，一者使用原来的C++ 语言进行开发，另外一种使用QML语言进行开发。这下搞得嘞，经常吵吵不亦乐乎，在Qt界从此就有两大阵营产生激烈的纷争，那就是选用qml还是widget好，大量初学者也会问这个问题，有以下几点总结。
 - widget属于传统界面开发，和VB/VC/Delphi等拖曳控件开发类似，走CPU绘制，能最大化的兼容现有的硬件和过去的相对偏低性能的硬件。
 - qml属于新时代的产物，大概从2010年开始，和flutter/Electron等web开发框架及移动开发框架类似，为了适应各种移动端开发及动画流畅性触摸丝滑体验、充分利用和“榨干”现在的GPU性能，把CPU留出来给用户最大化发挥。
 - 硬件性能越好，GPU越是强劲，qml的综合性能越是完爆widget，反之对比也是指数级的。除了极其省成本的嵌入式硬件领域或者国产CPU等，其他领域的硬件性能都是暴增。
@@ -2759,44 +3900,50 @@ for (int i = 0; i < count; ++i) {
 - 有的时候不禁要问，既生widget何生qml，学习成本和选择又多了，其实这正是和这个世界的哲学一样：世界是简单的又是复杂的。为了适应各种需求和满足需要。
 - 总之，无论qml还是widget，和找老婆一样，适合自己的就是最好的，自己擅长哪个就用哪个。
 - 如果还不知道擅长哪个，有空就两个都学，学习过程中自己就会有切身感受和对比，能者多劳多多益善。能够顺利的最快的完成老板的任务给老板赚钱才是王道。
+- 网友补充：如果你的软件最终是手指操作的多，就用qml，如果是鼠标操作的多，就选择widget。
 
-13. 写程序过程中发现问题，比如有些问题是极端特殊情况下出现，最好找到问题的根源，有时候肯定多多少少会怀疑是不是Qt本身的问题，怀疑是对的，但是99.9%的问题最终证实下来还是自己的代码写的不够好导致的，如果为了赶时间老板催的急，实在不行再用重启或者复位大法，比如搞个定时器、线程、网络通信啥的去检测程序是否正常，程序中某个模块或者功能是否正常，不正常就复位程序或者重启程序，在嵌入式上还可以更暴力一点就是系统重启和断电重启。
+14. 写程序过程中发现问题，比如有些问题是极端特殊情况下出现，最好找到问题的根源，有时候肯定多多少少会怀疑是不是Qt本身的问题，怀疑是对的，但是99.9%的问题最终证实下来还是自己的代码写的不够好导致的，如果为了赶时间老板催的急，实在不行再用重启或者复位大法，比如搞个定时器、线程、网络通信啥的去检测程序是否正常，程序中某个模块或者功能是否正常，不正常就复位程序或者重启程序，在嵌入式上还可以更暴力一点就是系统重启和断电重启。
 
-14. 写程序过程中尤其要注意32位的库和64位的库互不兼容，比如32位的程序引用64位的库，64位的程序引用32位的库，都是编译通不过的，而在windows64位系统中是能够运行32位程序的，因为64位的系统提供了32位的运行环境，一般目录在Program Files(x86)，32位的程序在64位的环境中最终引用的还是32位的库。关于如何判断自己的Qt库是多少位，有个误区就是很多人要么看成了QtCreator的关于信息中列出的位数，要么以为自己是64位的系统就认为是64位的Qt，最终要在Qt构建套件中查看具体位数，大概从Qt5.14开始基本上很少提供32位的库，尤其是Qt6.0以后基本上默认就是只有64位的库了，这也是顺应时代潮流，毕竟不久的将来（个人预计2030年以前）基本上32位的系统占比不超过1%，放心大胆的用64位的库吧，抛弃烦人的32位以及XP系统。
+15. 写程序过程中尤其要注意32位的库和64位的库互不兼容，比如32位的程序引用64位的库，64位的程序引用32位的库，都是编译通不过的，而在windows64位系统中是能够运行32位程序的，因为64位的系统提供了32位的运行环境，一般目录在Program Files(x86)，32位的程序在64位的环境中最终引用的还是32位的库。关于如何判断自己的Qt库是多少位，有个误区就是很多人要么看成了QtCreator的关于信息中列出的位数，要么以为自己是64位的系统就认为是64位的Qt，最终要在Qt构建套件中查看具体位数，大概从Qt5.14开始基本上很少提供32位的库，尤其是Qt6.0以后基本上默认就是只有64位的库了，这也是顺应时代潮流，毕竟不久的将来（个人预计2030年以前）基本上32位的系统占比不超过1%，放心大胆的用64位的库吧，抛弃烦人的32位以及XP系统。
 
-15. 关于动态和静态的一点个人理解：
+16. 关于程序中动态和静态的一点个人理解：
 - 在Qt程序中，分动态库版本的Qt和静态库版本的Qt。
 - 官方默认提供的二进制包就是动态库版本的Qt，如果自行编译则编译的时候对应参数 -shared。
-- 静态库版本的Qt需要自行编译，编译的时候对应参数 -static，（理论上个人用静态库的Qt也需要收费，因为静态编译后都看不到Qt的相关库文件）。
+- 静态库版本的Qt需要自行编译，编译的时候对应参数 -static，（理论上无论商业非商业使用Qt静态库需要收费，因为静态编译后都看不到Qt的相关库文件）。
 - 使用动态库的Qt支持编译生成动态库和静态库（CONFIG += staticlib）的程序。
-- 使用动态库的Qt程序支持动态库的引用（引用的时候 LIB += ，运行的时候需要动态库文件比如.dll .so 支持）。
+- 使用动态库的Qt程序支持动态库的引用（引用的时候 LIB += ，运行的时候需要动态库文件比如 .dll .so 文件支持）。
 - 使用动态库的Qt程序支持静态库的引用（引用的时候 LIB += ，运行的时候无需库文件支持，可以理解为该文件已经和可执行文件合二为一，缺点是可执行文件体积变大）。
+- 通过生成文件的个数和大小可以发现，静态库相当于把运行时需要的文件也一并合并到一个文件了，而动态库是拆分成两个文件，一个用于编译，一个用于运行。
 - 上述动态库的规则也通用于静态库。
 - 此规则应该是通用于其他语言框架。
-- 很多人有个误区包括几年前的我，以为要用Qt编写静态库，前提是Qt库必须静态的。
+- 很多人有个误区包括几年前的我，以为要用Qt编写静态库就必须用静态的Qt库，其实动态库的Qt也可以编写静态的库，只是该库不会生成动态库文件。
 - 如果要将Qt程序编译成静态的可执行文件（单个文件无依赖），前提是所用的Qt库必须静态的。
 
-16. 最后一条：珍爱生命，远离编程。祝大家头发浓密，睡眠良好，情绪稳定，财富自由！
+17. 后期的Qt版本，大致从5.15开始，就不在提供离线版本下载，需要自行通过在线安装器安装，由于默认服务器在国外，很多人反映下载的时候很慢，或者选择晚上的时候下载要快很多，为了解决这个烦人的问题，不至于时间都浪费在没有意义的等待上，有个极其简单的方法可以将速度提升几万倍，甚至冲坏你的硬盘。先下载 Fiddler5（尽量选择中文版本不然小白看不懂），双击打开程序后（可能win10自带的杀毒软件会报毒删除，临时停用杀毒软件或者恢复可信任文件即可），在底部的输入栏中输入 urlreplace download.qt.io mirrors.ustc.edu.cn/qtproject/ 回车应用，然后再去打开安装器在线安装，世界突然变得非常美好。
 
-### 六、七七八八
-#### 6.1 推荐开源主页
-| 名称 | 网址 |
-| :------ | :------ |
-|Qt交流大会群|群号：853086607|
-|Qt技术交流群|群号：46679801|
-|Qt进阶之路群|群号：734623697|
+18.  最后一条：珍爱生命，远离编程。祝大家头发浓密，睡眠良好，情绪稳定，财富自由！
+
+## 7 杂七杂八
+### 7.1 推荐开源主页
+|名称|网址|
+|:------ |:------|
+|Qt技术交流群1|46679801(已满员)|
+|Qt技术交流群2|573199610(未满员)|
+|Qt高级学习群 |951393302(未满员，推荐此群)|
+|Qt交流大会群 |853086607(已满员)|
 |QtWidget开源demo集合|[https://gitee.com/feiyangqingyun/QWidgetDemo](https://gitee.com/feiyangqingyun/QWidgetDemo)|
 |QtQuick/Qml开源demo集合|[https://gitee.com/jaredtao/TaoQuick](https://gitee.com/jaredtao/TaoQuick)|
 |QtQuick/Qml开源demo集合|[https://gitee.com/zhengtianzuo/QtQuickExamples](https://gitee.com/zhengtianzuo/QtQuickExamples)|
 
-#### 6.2 推荐网站主页
-| 名称 | 网址 |
-| :------ | :------ |
+### 7.2 推荐网站主页
+|名称|网址|
+|:------|:------|
 |qtcn|[http://www.qtcn.org](http://www.qtcn.org)|
 |豆子的空间|[https://www.devbean.net](https://www.devbean.net)|
 |yafeilinux|[http://www.qter.org](http://www.qter.org)|
 |feiyangqingyun|[https://blog.csdn.net/feiyangqingyun](https://blog.csdn.net/feiyangqingyun)|
-|**Qt系列文章**|[https://blog.csdn.net/feiyangqingyun/category_11460485.html](https://blog.csdn.net/feiyangqingyun/category_11460485.html)|
+|**Qt作品大全**|[https://qtchina.blog.csdn.net/article/details/97565652](https://qtchina.blog.csdn.net/article/details/97565652)|
+|Qt系列文章|[https://blog.csdn.net/feiyangqingyun/category_11460485.html](https://blog.csdn.net/feiyangqingyun/category_11460485.html)|
 |一去二三里|[http://blog.csdn.net/liang19890820](http://blog.csdn.net/liang19890820)|
 |乌托邦2号|[http://blog.csdn.net/taiyang1987912](http://blog.csdn.net/taiyang1987912)|
 |foruok|[http://blog.csdn.net/foruok](http://blog.csdn.net/foruok)|
@@ -2811,9 +3958,9 @@ for (int i = 0; i < count; ++i) {
 |涛哥的知乎专栏|[https://zhuanlan.zhihu.com/TaoQt](https://zhuanlan.zhihu.com/TaoQt)|
 |Qt君|[https://blog.csdn.net/nicai_xiaoqinxi](https://blog.csdn.net/nicai_xiaoqinxi)|
 
-#### 6.3 推荐学习网站
-| 名称 | 网址 |
-| :------ | :------ |
+### 7.3 推荐学习网站
+|名称|网址|
+|:------|:------|
 |Qt老外视频教程|[http://space.bilibili.com/2592237/#!/index](http://space.bilibili.com/2592237/#!/index)|
 |Qt维基补充文档|[https://wiki.qt.io/Main](https://wiki.qt.io/Main)|
 |Qt源码查看网站|[https://code.woboq.org/qt5](https://code.woboq.org/qt5)|
@@ -2821,6 +3968,13 @@ for (int i = 0; i < count; ++i) {
 |Qt官方下载新地址|[https://download.qt.io/new_archive/qt/](https://download.qt.io/new_archive/qt/)|
 |Qt国内镜像下载地址|[https://mirrors.cloud.tencent.com/qt](https://mirrors.cloud.tencent.com/qt)|
 |Qt安装包下载地址|[http://qthub.com/download/](http://qthub.com/download/)|
+|Qt最新版二进制包|[https://build-qt.fsu0413.me/](https://build-qt.fsu0413.me/)|
+|Qt版本更新内容|[https://doc-snapshots.qt.io/qt6-6.2/whatsnew62.html](https://doc-snapshots.qt.io/qt6-6.2/whatsnew62.html)|
+|Qt中qmake变量说明|[https://doc.qt.io/qt-5/qmake-variable-reference.html](https://doc.qt.io/qt-5/qmake-variable-reference.html)|
+|Qt入门最简单教程|[http://c.biancheng.net/qt/](http://c.biancheng.net/qt/)|
+|qss学习地址1|[http://47.100.39.100/qtwidgets/stylesheet-reference.html](http://47.100.39.100/qtwidgets/stylesheet-reference.html)|
+|qss学习地址2|[http://47.100.39.100/qtwidgets/stylesheet-examples.html](http://47.100.39.100/qtwidgets/stylesheet-examples.html)|
+|qss学习地址3|[https://doc.qt.io/qt-6/qstyle.html](https://doc.qt.io/qt-6/qstyle.html)|
 |精美图表控件QWT|[http://qwt.sourceforge.net/](http://qwt.sourceforge.net/)|
 |精美图表控件QCustomPlot|[https://www.qcustomplot.com/](https://www.qcustomplot.com/)|
 |免费图标下载|[http://www.easyicon.net/](http://www.easyicon.net/)|
@@ -2828,8 +3982,7 @@ for (int i = 0; i < count; ++i) {
 |漂亮界面网站|[https://www.ui.cn/](https://www.ui.cn/)|
 |微信公众号|**官方公众号：Qt软件** &nbsp; **亮哥公众号：高效程序员**|
 
-### 七、书籍推荐
-
+## 8 书籍推荐
 1. C++入门书籍推荐《C++ primer plus》，进阶书籍推荐《C++ primer》。
-2. Qt入门书籍推荐霍亚飞的《Qt Creator快速入门》，Qt进阶书籍推荐官方的《C++ GUI Qt4编程》，qml书籍推荐《Qt5编程入门》。
+2. Qt入门书籍推荐霍亚飞的《Qt Creator快速入门》，Qt进阶书籍推荐官方的《C++ GUI Qt4编程》，qml书籍推荐《Qt5编程入门》，Qt电子书强烈推荐《Qt5.10 GUI完全参考手册》。
 3. 强烈推荐程序员自我提升、修养、规划系列书《走出软件作坊》《大话程序员》《程序员的成长课》《解忧程序员》，受益匪浅，受益终生！
