@@ -4,13 +4,13 @@
 2. **视频主页：[https://space.bilibili.com/687803542](https://space.bilibili.com/687803542)**
 3. **网店地址：[https://shop244026315.taobao.com](https://shop244026315.taobao.com)**
 4. **联系方式：QQ（517216493）微信（feiyangqingyun）推荐加微信。**
-5. **公 众 号：Qt实战（本人）/Qt教程（民间）/Qt软件（官方）**
+5. **公 众 号：Qt实战/Qt入门和进阶/Qt教程/Qt软件**
 6. **版本支持：所有项目已经全部支持Qt4/5/6所有版本以及后续版本。**
 7. 监控作品体验：[https://pan.baidu.com/s/1d7TH_GEYl5nOecuNlWJJ7g](https://pan.baidu.com/s/1d7TH_GEYl5nOecuNlWJJ7g) 提取码：01jf
 8. 其他作品体验：[https://pan.baidu.com/s/1ZxG-oyUKe286LPMPxOrO2A](https://pan.baidu.com/s/1ZxG-oyUKe286LPMPxOrO2A) 提取码：o05q
-9. 监控系统在线文档：[https://feiyangqingyun.gitee.io/QWidgetDemo/video_system/](https://feiyangqingyun.gitee.io/QWidgetDemo/video_system/)
-10. 大屏系统在线文档：[https://feiyangqingyun.gitee.io/QWidgetDemo/bigscreen/](https://feiyangqingyun.gitee.io/QWidgetDemo/bigscreen/)
-11. 物联网系统在线文档：[https://feiyangqingyun.gitee.io/QWidgetDemo/iotsystem/](https://feiyangqingyun.gitee.io/QWidgetDemo/iotsystem/)
+9. 监控系统在线文档：[http://www.qtcdev.com/video_system/](http://www.qtcdev.com/video_system/)
+10. 大屏系统在线文档：[http://www.qtcdev.com/bigscreen/](http://www.qtcdev.com/bigscreen/)
+11. 物联网系统在线文档：[http://www.qtcdev.com/iotsystem/](http://www.qtcdev.com/iotsystem/)
 
 ## 1 开发经验
 ### 01：001-010
@@ -21,6 +21,18 @@
 QMetaObject::invokeMethod(this, "load", Qt::QueuedConnection);
 //延时10毫秒执行load函数
 QTimer::singleShot(10, this, SLOT(load()));
+
+//定时器lambda表达式方式
+QTimer::singleShot(10, [&]() {
+  load();
+});
+
+QTimer *timer = new QTimer(this);
+timer->setSingleShot(true);
+connect(timer, &QTimer::timeout, this, [timer, this] {
+
+});
+timer->start(5000);
 ```
 
 3. 默认QtCreator是单线程编译，可能设计之初考虑到尽量不过多占用系统资源，而现在的电脑都是多核心的，默认msvc编译器是多线程编译的不需要手动设置，而对于其他编译器，需要手动设置才行。
@@ -561,7 +573,15 @@ setsockopt(fd, SOL_TCP, TCP_KEEPCNT, (void *)&keepCount, sizeof(keepCount));
 
 58. 非常不建议tr中包含中文，尽管现在的新版Qt支持中文到其他语言的翻译，但是很不规范，也不知道TMD是谁教的（后面发现我在刚学Qt的时候也发布了一些demo到网上也是tr包含中文的，当时就狠狠的打了自己一巴掌），tr的本意是包含英文，然后翻译到其他语言比如中文，现在大量的初学者滥用tr，如果没有翻译的需求，禁用tr，tr需要开销的，Qt默认会认为他需要翻译，会额外进行特殊处理。
 
-59. 很多人Qt和Qt Creator傻傻分不清楚，经常问Qt什么版本结果发一个Qt Creator的版本过来，Qt Creator是使用Qt编写的集成开发环境IDE，和宇宙第一的Visual Studio一样，他可以是msvc编译器的（windows对应的Qt集成安装环境中自带的Qt Cerator是msvc的），也可以是mingw编译的，还可以是gcc的。如果是自定义控件插件，需要集成到Qt Creator中，必须保证该插件的动态库文件（dll或者so等文件）对应的编译器和Qt版本以及位数和Qt Creator的版本完全一致才行，否则基本不大可能集成进去。特别注意的是Qt集成环境安装包中的Qt版本和Qt Creator版本未必完全一致，必须擦亮眼睛看清楚，有些是完全一致的。由于新版的Qt要求在线安装，而且在线安装选择器中Qt Creator的版本无法选择，新版的Qt Creator用的是Qt6编译的，所以就出现了win7系统不支持的情况，推荐用win10或者win11系统做开发环境。你可以在高版本的Qt Creator中做开发，选择支持win7的套件版本比如5.15或者选择支持xp的套件版本5.6即可，发布后依然可以正常在低版本的系统运行。
+59. 关于Qt和Qt Creator的区别
+- 很多人Qt和Qt Creator傻傻分不清楚，经常问看下Qt什么版本，结果发一个Qt Creator的版本过来。
+- Qt Creator是使用Qt编写的集成开发环境IDE，和宇宙第一的Visual Studio一样。
+- 他可以是msvc编译器的（windows对应的Qt集成安装环境中自带的Qt Cerator是msvc的），也可以是mingw编译的，还可以是gcc的。
+- 如果是自定义控件插件，需要集成到Qt Creator中，必须保证该插件的动态库文件（dll或者so等文件）对应的编译器和Qt版本以及位数和Qt Creator的版本完全一致才行，否则基本不大可能集成进去。
+- 特别注意的是Qt集成环境安装包中的Qt版本和Qt Creator版本未必完全一致，必须擦亮眼睛看清楚，有些是完全一致的。
+- 由于新版的Qt要求在线安装，而且在线安装选择器中Qt Creator的版本无法选择，新版的Qt Creator用的是Qt6编译的，所以就出现了win7系统不支持的情况。
+- 推荐用win10或者win11系统做开发环境。
+- 你可以在高版本的Qt Creator中做开发，选择支持win7的套件版本比如5.15或者选择支持xp的套件版本5.6即可，发布后依然可以正常在低版本的系统运行。
 
 60. 超过两处相同处理的代码，建议单独写成函数。代码尽量规范精简，比如 if(a == 123) 要写成 if (123 == a)，值在前面，再比如 if (ok == true) 要写成 if (ok)，if (ok == false) 要写成 if (!ok)等。
 
@@ -908,16 +928,17 @@ projD.depends = projC
 QDialog dialog;
 dialog.setWindowModality(Qt::WindowModal);
 ```
-
-107. 很多初学者甚至几年工作经验的人，对多线程有很深的误解和滥用，尤其是在串口和网络通信这块，什么都往多线程里面丢，一旦遇到界面卡，就把数据收发啥的都搞到多线程里面去，殊不知绝大部分时候那根本没啥用，因为没找到出问题的根源。
-- 如果你没有使用wait***函数的话，大部分的界面卡都出在数据处理和展示中，比如传过来的是一张图片的数据，你需要将这些数据转成图片，这个肯定是耗时的；
+很多初学者甚至几年工作经验的人，对多线程有很深的误解和滥用，尤其是在串口和网络通信这块，什么都往多线程里面丢，一旦遇到界面卡，就把数据收发啥的都搞到多线程里面去，殊不知绝大部分时候那根本没啥用，因为没找到出问题的根源。
+- 如果你没有使用waitxxx函数的话，大部分的界面卡都出在数据处理和展示中，比如传过来的是一张图片的数据，你需要将这些数据转成图片，这个肯定是耗时的；
 - 还有就是就收到的数据曲线绘制出来，如果过于频繁或者间隔过短，肯定会给UI造成很大的压力的，最好的办法是解决如何不要频繁绘制UI比如合并数据一起绘制等；
 - 如果是因为绘制UI造成的卡，那多线程也是没啥用的，因为UI只能在主线程；
 - 串口和网络的数据收发默认都是异步的，由操作系统调度的，如果数据处理复杂而且数据量大，你要做的是将数据处理放到多线程中；
-- 如果没有严格的数据同步需求，根本不需要调用wait***之类的函数来立即发送和接收数据，实际需求中大部分的应用场景其实异步收发数据就足够了；
-- 有严格数据同步需求的场景还是放到多线程会好一些，不然你wait***就卡在那边了；
+- 如果没有严格的数据同步需求，根本不需要调用waitxxx之类的函数来立即发送和接收数据，实际需求中大部分的应用场景其实异步收发数据就足够了；
+- 有严格数据同步需求的场景还是放到多线程会好一些，不然你waitxxx就卡在那边了；
 - 多线程是需要占用系统资源的，理论上来说，如果线程数量超过了CPU的核心数量，其实多线程调度可能花费的时间更多，各位在使用过程中要权衡利弊；
 - 再次强调，不要指望Qt的网络通信支持高并发，最多到1000个能正常工作就万事大吉，一般建议500以内的连接数。有大量高并发的需求请用第三方库比如swoole等。
+
+107. 
 
 108. 在嵌入式linux上，如果设置了无边框窗体，而该窗体中又有文本框之类的，发现没法产生焦点进行输入，此时需要主动激活窗体才行。
 ```cpp
@@ -1188,9 +1209,9 @@ bool frmMain::winEvent(MSG *message, long *result)
 #endif
 ```
 
-130. Qt的pro项目管理配置文件中也可添加各种编译前后的操作及配置，主要通过 QMAKE_POST_LINK和QMAKE_PRE_LINK，他们支持的函数以及写法，可以在QtCreator的帮助中搜索 qmake Function Reference 查看详情说明。
-- QMAKE_PRE_LINK    表示编译前执行内容
-- QMAKE_POST_LINK   表示编译后执行内容
+130. Qt的pro项目管理配置文件中也可添加各种编译链接前后的操作及配置，主要通过 QMAKE_POST_LINK和QMAKE_PRE_LINK，他们支持的函数以及写法，可以在QtCreator的帮助中搜索 qmake Function Reference 查看详情说明。
+- QMAKE_PRE_LINK    表示编译链接前执行内容
+- QMAKE_POST_LINK   表示编译链接后执行内容
 ```cpp
 
 #也可以用通配符 *.txt / *.* / *
@@ -1203,21 +1224,27 @@ srcFile1 = $$replace(srcFile1, /, \\);
 srcFile2 = $$replace(srcFile2, /, \\);
 dstPath = $$replace(dstPath, /, \\);
 
-#编译前执行拷贝 多个拷贝可以通过 && 符号隔开
+#编译链接前执行拷贝 多个拷贝可以通过 && 符号隔开
 QMAKE_PRE_LINK += copy /Y $$srcFile1 $$dstPath && copy /Y $$srcFile2 $$dstPath
-#编译后执行拷贝 多个拷贝可以通过 && 符号隔开
+#编译链接后执行拷贝 多个拷贝可以通过 && 符号隔开
 QMAKE_POST_LINK += copy /Y $$srcFile1 $$dstPath && copy /Y $$srcFile2 $$dstPath
 
 #下面演示加载pro项目的时候就执行拷贝/很多时候要的就是这种方式
+srcFile = $$PWD/qrc/*.*
+dstPath = $$PWD/bin
 srcFile ~= s,/,\\,g
 dstPath ~= s,/,\\,g
+
+#windows使用xcopy命令/unix使用cp命令/unix不需要转换路径
 system(xcopy $$srcFile $$dstPath /y /e)
+system(cp $$srcFile $$dstPath -f)
+system($$QMAKE_COPY $$srcFile $$dstPath)
 ```
 
 ### 14：131-140
 131. Qt新版本往往会带来一些头文件的更新，比如以前使用QPainter绘制，不需要额外包含QPainterPath头文件，而5.15版本开始就需要显示主动引入#include "qpainterpath.h"才行。
 
-132. Qt6.0发布了，是个比较大的改动版本，很多基础的类或者组件都放到单独的源码包中，需要自行官网下载并编译，默认不提供集成在开发目录下，需要手动编译并集成，比如QRegExp，QTextCodec类，需要编译集成后pro文件 QT += core5compat 才能用， 具体说明在https://doc.qt.io/qt-6/qtcore5-index.html。
+132. Qt6.0发布了，是个比较大的改动版本，很多基础的类或者组件都放到单独的源码包中，6.0到6.2之间的版本需要自行官网下载并编译，需要手动编译并集成，比如QRegExp，QTextCodec类，需要编译集成后pro文件 QT += core5compat 才能用， 具体说明在https://doc.qt.io/qt-6/qtcore5-index.html。大概从Qt6.2开始，又不需要自己编译了，安装的时候勾选core5compat模块即可，默认不勾选。
 
 133. qDebug输出打印信息，默认会完整打印转义字符，例如：\\  \" \t \n" 等，所以当你发现你明明设置了转义字符以后打印确还是转义前的字符，这就懵逼了，其实这是qdebug为了方便调试将各种字符都打印输出。无可否认，很多时候，我们极其兴奋的享受着Qt带来的各种轮子各种便利，但是偶尔，稍不留意，这些便利可能也会坑你一把。要做的就是擦亮眼睛，时刻谨慎，一步一个脚印踏踏实实码代码。
 ```cpp
@@ -2717,7 +2744,7 @@ WindowsArguments = dpiawareness=0
 195. 关于QSS要注意的坑。
 - qss源自css，相当于css的一个子集，主要支持的是css2标准，很多网上的css3的标准的写法在qss这里是不生效的，所以不要大惊小怪。
 - qss也不是完全支持所有的css2，比如text-align官方文档就有说明，只支持 QPushButton and QProgressBar，务必看清楚。
-- 有时候偷懒直接来一句 *{xxx}，你会发现大部分是应用了，也有小部分或者极个别没有应用，你可能需要在对应的窗体中 this->setStyleSheet() 来设置。
+- 有时候偷懒直接来一句 \*{xxx}，你会发现大部分是应用了，也有小部分或者极个别没有应用，你可能需要在对应的窗体中 this->setStyleSheet() 来设置。
 - qss的执行是有优先级的，如果没有指定父对象，则对所有的应用，比如在窗体widget中 {color:#ff0000;} 这样会对widget以及widget的所有子对象应用该样式，这种问题各大群每周都有人问，你会发现各种奇奇怪怪的异样不正常，怎么办呢，你需要指定类名或者对象名，比如 #widget{color:#ff0000;} 这样就只会对widget对象应用该样式，另一种写法 QWidget#widget{color:#ff0000;}，只想对窗体本身而不是子控件按钮标签等 .QWidget{color:#ff0000;} ，具体详细规则参见官方说明。
 - qss整体来说还是可以的，解析速度性能在Qt5高版本后期比Qt4好很多，尤其是修复了不少qss中的解析绘制BUG。尽管有这样那样的BUG，怀着包容的心对待它。
 - qss官方学习地址1：[http://47.100.39.100/qtwidgets/stylesheet-reference.html](http://47.100.39.100/qtwidgets/stylesheet-reference.html)
@@ -3166,7 +3193,7 @@ int DataCsv::findCode(const QString &fileName)
         } else if (b1 == 0xEF && b2 == 0xBB && b3 == 0xBF) {
             code = 4;
         } else {
-            //尝试用utf8转换,如果可用字符数大于0,则表示是ansi编码
+            //尝试用utf8转换,如果无效字符数大于0,则表示是ansi编码
             QTextCodec::ConverterState state;
             QTextCodec *codec = QTextCodec::codecForName("utf-8");
             codec->toUnicode(buffer.constData(), buffer.size(), &state);
@@ -3459,7 +3486,7 @@ class tt {
 - 查询条件中含有is null的select语句执行慢，is not null 时永远不会使用索引，一般数据量大的表不要用is null查询。
 - 不等于操作符 <> 和 != 会限制索引，引起全表扫描，即使比较的字段上有索引。
 - where子句中比较的两个条件，一个有索引，一个没索引，使用or则会引起全表扫描。
-- select count(*) from table 这样不带任何条件的count会引起全表扫描。
+- select count(\*) from table 这样不带任何条件的count会引起全表扫描。
 - in 和 not in 也要慎用，否则会导致全表扫描，能用 between 就不要用 in。
 - 用 >= 替代 >，比如 高效写法：select * from table where id >= 4，低效写法：select * from table where id > 3。
 - 如果表数据量很小，比如就几千行，请忽略上述警告，加不加索引问题不大，甚至某些时候加索引反而极大增加了数据库文件的体积，影响更新数据库的速度。
@@ -4455,6 +4482,272 @@ QDir::setCurrent(path);
 img.save("1.jpg", "jpg");
 ```
 
+297. 大概从Qt6.4开始，如果项目中同时使用了QOpenGLWidget和QWebEngine浏览器控件，可能会出现QWebEngine加载网页黑屏的情况，6.4.3和6.5.3版本必现。根据官网的描述[https://doc.qt.io/qt-6/qquickwidget.html#graphics-api-support](https://doc.qt.io/qt-6/qquickwidget.html#graphics-api-support) ，你需要额外加一行代码。
+```cpp
+#include "qquickwindow.h"
+int main(int argc, char *argv[])
+{
+    QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+    QApplication a(argc, argv);
+}
+```
+
+298. 现在现在新版的Qt都是需要在线下载，有时候下载到中途过程会遇到提示下载错误，很可能是部分插件模块对应服务器没有打包导致的，一般都是一些末尾带TP字样的模块，这些模块一般也不会用，所以如果想要安装成功，你需要到选择Qt版本和插件的地方，打开Additional Libraries节点，将那些用不上的尤其是TP结尾的都不勾选，再安装即可。
+
+299. Qt中可以通过qputenv和qgetenv来设置和获取系统环境变量，既可以在代码中设置对应的值，也可以在系统环境变量中设置，比如windows系统环境变量中设置，相当于可以自定义字符串指定值，这样灵活性大大增强，有时候因为代码不能修改了，可以尝试去设置一个Qt认识的环境变量字符串值来产生效果。这里要特别提示的是，环境变量设置后一定要生效才能正常读取到，比如xp系统设置后可能要重启操作系统才能生效，还有一个是要重启QtCreator才能识别到最新的环境变量，可能是做了缓存机制。
+```cpp
+//设置每个窗口都有独立的句柄
+QApplication a(argc, argv);
+a.setAttribute(Qt::AA_NativeWindows);
+
+//上面的方法是通过代码的方式设置/有时候已经是可执行文件/无法修改代码
+//经过查阅代码得知会优先通过qgetenv读取是否有QT_USE_NATIVE_WINDOWS标志
+//如果存在则按照QT_USE_NATIVE_WINDOWS变量的值进行赋值
+//这种方法有个缺点/就是所有的Qt程序都会应用
+```
+
+300. 布局的setContentsMargins函数参数依次是左上右下，而qss中的margin依次是上右下左，很多人混搞混。
+
+### 31：301-310
+301. 从Qt5.2版本开始，QLineEdit文本框控件提供了setClearButtonEnabled函数用于是否开启右侧的关闭按钮，这种控件非常常见，比如还可以增加个搜索按钮，怎么添加呢，在5.2版本以前要自己定义一个布局，然后new一个按钮放在布局右侧。在5.2版本以后，提供了addAction重载方法，用于添加一个动作到文本框的前面或者后面，这种方式会自动留出边距。
+```cpp
+#if (QT_VERSION < QT_VERSION_CHECK(5,2,0))
+    //所有Qt版本都兼容的万能办法
+    QPushButton *searchButton = new QPushButton;
+    //执行对应的处理
+    connect(searchButton, SIGNAL(clicked(bool)), this, SLOT(search()));
+    searchButton->setMinimumWidth(30);
+    searchButton->setIcon(QIcon(":/main.ico"));
+
+    //实例化布局用于放置按钮
+    QHBoxLayout *layout = new QHBoxLayout(ui->lineEdit);
+    layout->setContentsMargins(0, 0, 1, 0);
+    //指定对齐方式添加按钮
+    layout->addWidget(searchButton, 0, Qt::AlignRight);
+    //设置文本的外边距/空出距离放置按钮
+    ui->lineEdit->setTextMargins(0, 0, searchButton->minimumWidth() + 3, 0);
+#else
+    //推荐用下面这个方法更方便
+    QAction *searchAction = new QAction(ui->lineEdit);
+    //执行对应的处理
+    connect(searchAction, SIGNAL(triggered(bool)), this, SLOT(search()));
+    searchAction->setIcon(QIcon(":/main.ico"));
+    //TrailingPosition表示右侧/还可以是LeadingPosition表示左侧
+    ui->lineEdit->addAction(searchAction, QLineEdit::TrailingPosition);
+#endif
+```
+
+302. 大概从6.5版本开始，mingw编译的debug套件编译大名鼎鼎的qcustomplot开源图表控件，会提示报错too many sections/file too big字样。release套件或者其他编译器都正常。你只需要在pro中加上 QMAKE_CXXFLAGS += -Wa,-mbig-obj 即可。
+
+303. 大概从2024年开始，在线安装Qt的工具默认不加载Qt5的安装包，需要在右上角有个什么 Archive 的，勾选一下，然后单击 Filter/筛选 按钮即可，这样左侧就会将Qt5的也都显示出来。估计官网是想强制让我们用Qt6，慢慢的把Qt5淘汰。可惜的是Qt6不支持win7，而win7目前用户数还是很多的。
+
+304. 使用Qt的drawText绘制文本，如果使用的对应参数是QPoint坐标的函数，drawText(const QPoint &p, const QString &s)，务必注意他是以左下角作为起始点的（Qt文档中特意写了 The y-position is used as the baseline of the font），这个和其他开发框架比如C#等都不同，理论上按照屏幕绘制规则，应该是左上角才对，所以涉及到和其他平台对接的时候，建议采用 void drawText(const QRect &r, const QString &text) 函数绘制，指定一个区域。这个知识点很容易被忽视，从而造成灾难性的后果。
+305. 在linux上使用webengine浏览器模块打开网页时，有些系统可能出现崩溃的现象，就算是直接编译运行自带的浏览器示例比如simplebrowser，也是无法正常打开网页。原因是为了安全性考虑，沙箱运行啥的，需要设置个环境变量。只需要在main函数最前面加一行 qputenv("QTWEBENGINE_DISABLE_SANDBOX", "1") 即可。
+
+305. 在QListWidgetItem设置复选框后，有时候希望在切换复选框的时候有个信号通知，以便进行处理，到这里你会发现，QListWidget所有信号中并没有该信号，通过查阅QListWidgetItem的setCheckState函数源码得知，会发送一个dataChanged信号，该信号是QListWidget的数据模型发出来的，于是就很好办了。
+```cpp
+void Form::on_listWidget_itemPressed(QListWidgetItem *item)
+{
+    //鼠标按下切换选中状态
+    item->setCheckState(item->checkState() == Qt::Checked ? Qt::Unchecked : Qt::Checked);
+}
+
+void Form::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+{
+	//为什么需要通过文本再去找到节点/而不是取选中的节点/因为不选中也可以勾选前面的复选框
+    QListWidgetItem *item;
+    QString text = topLeft.data().toString();
+    int count = ui->listWidget->count();
+    for (int i = 0; i < count; ++i) {
+        item = ui->listWidget->item(i);
+        if (item->text() == text) {
+            break;
+        }
+    }
+
+    //找到对应节点后进行处理
+}
+```
+
+306. 远程过很多人电脑远程分析问题，发现一个通病，比如明明修改了某个数据库或者配置文件，结果运行程序一看，还是旧的数据，死活都不行，查了半天程序，始终找不到问题所在。最终查到原来是程序读取的文件根本不是修改过的文件，因为用户电脑环境中有好几份同样的代码目录，他打开的目录是另外一份，无论怎么修改，其实都是和当前程序无关的，根本没有改对地方。大数据统计，这种情况还真不少，至少占五分之一的比例。有好几份拷贝的情况很多时候避免不了，比如为了临时备份代码，以便测试新的代码。但是务必记得当前项目做过拷贝，遇到问题的时候先检查目录是否正确，是否是当前打开的项目代码所在目录。
+
+307. 在使用第三库的过程中，当你使用的库种类越多，会发现一个现象，有些库依赖编译器的，比如opencv，如果你用msvc编译出来的库，那你的程序只能用msvc的套件才能正常链接该库，你要是用mingw去链接肯定失败的，要想用mingw也能成功链接，你只能用mingw去编译opencv。到这里你是不是以为都是这个规则？那就错了，当你用ffmpeg的库的时候，就不存在这个问题，官方下载的库文件，既能用msvc也能用mingw去链接。这是因为ffmpeg是纯c项目，而opencv是纯c++项目，涉及到ABI的问题，这是C++的特性导致的。C++是一种复杂的编程语言，支持继承和多态，因此编译器要想保证准确调用函数，就需要确定其调用约定（函数名区分、参数输入、栈管理等）、返回类型及参数列表。在同一种架构下不同编译器对此导出的规则不一致。所以总结就是，纯c的项目编译出来的库不用区分编译器，纯c++的需要区分。qtav作者有个最新力作mdk项目，也是纯c写的，提供了mingw和msvc的库，无论何种编译器编译出来的库，都同时兼容msvc和mingw编译器，这就是纯c的魅力。
+
+308. 有时候我们需要写入文件到磁盘，但是有些情况下，如果对应目录不存在则写入失败，需要先判断目录是否存在，不存在则新建，QDir提供了mkdir和mkpath两种方法来创建目录，以前以为这两个是一样的功能，类似于size和length，其实不是的，直到近期才发现了区别。mkdir只会创建路径中的最末尾的目录，如果父目录不存在，则创建失败。而mkpath会逐级判断整个路径的目录，父目录不存在则创建父目录，依次下去，保证指定的路径创建成功，建议使用mkpath。这里还必须特别提示一点，使用mkpath创建相对目录，会递归多创建一个同名的子目录，比如./0则会创建 ./0/0两个目录，为了避免这个问题，需要改成绝对路径。
+```cpp
+QDir dir;
+//如果path目录不存在则dir目录也会创建失败
+dir.mkdir("f:/path/dir");
+//会先创建path目录然后创建dir目录
+dir.mkpath("f:/path/dir");
+
+//会在可执行文件当前目录下创建 ./dir/dir 两个目录
+dir.mkdir("./dir");
+//改成绝对路径则只会创建 ./dir 目录
+QString path = "./dir";
+QDir dir(path);
+if(dir.isRelative()) {
+  dir.makeAbsolute();
+  path = dir.path();
+}
+dir.mkpath(path);
+```
+
+309. 当你在widget项目中将js文件添加到资源文件中，编译的时候很可能出现 qmlcache_loader.o:qmlcache_loader.cpp:(.text+0x32) 错误，这是因为qtc默认会开启qtquickcompiler，以便通过预处理资源中的所有js文件，加快文件加载到Qml引擎的速度，但是有些时候我们并不是用它加载到qml运行，可能是放在QtWebEngine中用于交互，或者widget中执行js函数拿到结果。可以在qtc的项目配置中找到qt quick compiler选项，下拉框选择禁用。也可以在pro中加一行 CONFIG -= qtquickcompiler 即可。这个确切的说是qt的bug，在5.15.2以及后续版本不存在。
+
+310. 新版的QtCreator默认的编译目录路径在源码下build目录，之前是在源码同级的build-xxx目录，个人还是喜欢之前的方式，所有编译生成的临时文件在源码外单独的一个目录，不需要的时候直接删除就好，源码目录永远干干净净的。当然qtc也是提供了设置目录的地方，在首选项-》构建和运行-》Default Build Properties 里面第一行，将之前的 ./build/%{Asciify:%{Kit:FileSystemName}-%{BuildConfig:Name}} 改成 ../build-%{Project:Name}-%{Kit:FileSystemName}-%{BuildConfig:Name} 即可。
+
+### 32：311-320
+311. 关于流媒体推拉流延时的几点说明。
+- 经常看到一些流媒体相关的程序，号称零延迟，不用怀疑，这肯定吹牛逼的。
+- 搞音视频开发，有个核心的指标就是实时性，也就是延迟多少毫秒，这个问题问的也是最多的。
+- 音视频文件几乎不存在实时性问题，只有音视频流才有实时性的指标。
+- 延迟多久这个涉及到很多方面，也要看你如何计算，从推流开始计算还是从拉流开始计算。
+- 很多小伙伴们并不能明白什么叫延时，认为随便一个播放器播放出来的画面跟原始流画面时间差就是延时，其实这是对延时最大的误解。延时不是表象，很多人在测试延时时很不专业，对延时测试的专业性认识不足。
+- 下面整理的是zlm作者写的关于延时的文章，非常完整而且有代表性。
+- 采集延时：在采集摄像头或显卡画面时，由于fps的限制和cpu性能、内存拷贝速度等客观限制，采集画面成YUV/RGB等数据时会有一定的延时，一般延时为毫秒级别。由于一般编码器对输入数据格式存在限制，譬如要求统一输入YUV420P，这样在做RGB->YUV420P转换时，也会有转换计算延时(这个可以通过libyuv库来降低)。总而延时，采集延时大概为毫秒级别，如果fps为25，那么一般采集延时会有40毫秒（1000毫秒/25fps）以上的延时，在内存拷贝和颜色转换时，又可能增加若干毫秒的延时。
+- 编码延时：在把原始画面输入到编码器时，并不会立即输出编码后的数据，特别是在开启B帧时，由于需要参考后面的P帧，那么延时会更大，所以延时敏感的情况下一般不开启B帧，这种情况下编码延时应该是毫秒级别，不是很大。
+- 上行延时：编码后的数据，要经过一定的协议打包才能写入socket，然后传输给推流服务器或拉流代理服务器，协议打包会有一定的内存拷贝和计算量，那么会增加延时，不过这个延时很小，基本忽略不计。数据在上传到服务器时，这个延时可大可小，取决于网络质量。
+- 转换延时：服务器在收到数据后，要读socket缓存、协议解析、解复用、重新打包等操作，不过总体而言，这个延时比较小，基本没什么影响。有时，服务器为了提高性能，会采取合并写的机制，也就是收到一定量的数据后才会一并转发，这个延时一般为几百毫秒，ZLMediaKit默认300毫秒左右，不过ZLMediaKit默认关闭合并写，也就是这个延时也很小。
+- 下行延时：流媒体在把视频数据转发给播放器时，会存在网络发送，这个延时大小取决于网络质量，ZLMediaKit在关闭低延时模式时，还会增加MSG_MORE和关闭TCP_NODELAY导致的延时，不过ZLMediaKit默认开启低延时模式。
+- 播放延时：播放器延时主要有网路接收延时、协议解析解复用延时、解码延时、缓存延时、渲染延时组成，这些延时中缓存延时最大，因为一般的播放器为了保证在网络抖动情况下视频播放的流畅性，会以增加延时为代价，增加播放缓存，这样在网络变差时，不至于播放缓冲卡顿。而且为了音视频同步，也必须确保一定的缓存量。这种延时一般都是秒级别，一般5秒左右。有部分播放策略是接收到数据后立即解码显示比如rtsp视频流，这样可以做到延迟最小。
+- 缓存延时：流媒体服务器为了能让播放器立即出画面，往往会缓存最近的一个I帧，这个I帧往后的所有音视频数据被称作为GOP缓存。如果不缓存GOP，那么播放器要等下一个I帧才能解码成功或不花屏，显然为了提高播放体验，这个GOP缓存是不能去掉的。而一般GOP短则1~3秒，长则10几秒，这个跟采集端编码器设置有关，服务器改变不了。但是由于一般的播放器收到缓存后，并不会丢弃过多的画面来确保低延时。况且播放器还希望有一定的缓存来确保播放的流畅性，所以这个GOP缓存将会增大播放器的延时。
+- 综合延时：最快可以做到200-300ms的延迟，比如rtsp视频流，对实时性要求高，可以不做缓存和音视频同步，收到就立即解码播放。hls一般最快可以做到5s延迟，flv一般可以做到3s延迟。
+- 最终总结：综合考虑实时性以及支持的音视频格式，个人建议，推流用rtsp推流（支持的音视频格式最友好，比如支持265），拉流在web上个人推荐用ws-flv格式拉流（支持的格式多，没有6个同源的限制），拉流在可执行文件上用rtsp（格式多而且实时性最好，可以最快速度解码播放），在网页上虽然webrtc实时性最好，但是不支持265，这个就难搞。
+
+312. Qt自带的对话框的按钮设置中文。
+```cpp
+//信息框设置中文
+QMessageBox dialog(QMessageBox::Question, "询问", text);
+dialog.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+dialog.button(QMessageBox::Yes)->setText("确 定");
+dialog.button(QMessageBox::No)->setText("取 消");
+return dialog.exec();
+
+//输入框设置中文
+QInputDialog dialog;
+dialog.setOkButtonText("确定");
+dialog.setCancelButtonText("取消");
+return dialog.exec();
+
+//对话框设置中文
+QFileDialog dialog;
+dialog.setOption(QFileDialog::DontUseNativeDialog, true);
+QLabel *lookinLabel = dialog.findChild<QLabel*>("lookInLabel");
+lookinLabel->setText("文件目录：");
+```
+
+313. 有时候需要对树状节点进行搜索过滤显示，匹配到的节点显示，没有匹配的隐藏。这个功能很多地方用，封装了一个静态函数直接调用。
+```cpp
+//调用方法 QtHelper::search(ui->treeWidget, "测试", 5);
+void QtHelper::search(QTreeWidget *treeWidget, const QString &key, int level)
+{
+    //找到所有匹配的节点
+    QList<QTreeWidgetItem *> items = treeWidget->findItems(key, Qt::MatchContains | Qt::MatchRecursive);
+
+    //将匹配到的节点加入队列/该节点的父节点也相当于匹配/不然父节点隐藏子节点也会跟着隐藏
+    QList<QTreeWidgetItem *> itemAll;
+    foreach (QTreeWidgetItem *item, items) {
+        //当前节点的所有父节点也添加进去/几次循环相当于几个层级
+        for (int i = 0; i < level; ++i) {
+            //去重添加
+            if (!itemAll.contains(item)) {
+                itemAll << item;
+            }
+            //为空表示没有父节点则跳出循环
+            item = item->parent();
+            if (!item) {
+                break;
+            }
+        }
+    }
+
+    //遍历所有节点/匹配的节点显示否则隐藏
+    QTreeWidgetItemIterator it(treeWidget);
+    while (*it) {
+        (*it)->setHidden(!itemAll.contains(*it));
+        ++it;
+    }
+}
+```
+
+314. 在Qt中实现组播是非常容易的事情，从4.8开始支持组播，为啥要用组播而不是广播？因为广播会产生广播数据风暴，每个设备都会收到，而且针对某个网段的广播比如192.168.0.255，不能跨网段。而组播不仅可以跨网段，还不会出现数据风暴，只对加入了组播的目标进行数据发送，非常适合用来做局域网设备搜索和配置。在测试过程中，如果是两台真机之间测试组播，没有问题，但是很多时候开发机只有一台，最多就是在开发机上安装了虚拟机，可以有多个系统可以测试，那么问题来了，虚拟机之间的组播需要经过设置才能正常通信。第一点就是虚拟机的网络必须是桥接模式，也就是网络地址和宿主主机同一网段。第二点最关键，需要在两个虚拟机产生的网卡设备（VMware Network Adapter VMnet1/VMware Network Adapter VMnet8）右键属性进去设置，在此连接使用下列项目中勾选一个VMware Bridge Protocol确定，重启网卡即可。
+```cpp
+//绑定端口
+udpSocket->bind(QHostAddress("0.0.0.0"), 6789);
+//设置组播数据不给自己发送/一般都会有这个设置/防止数据又发给自己造成死循环
+udpSocket->setSocketOption(QAbstractSocket::MulticastLoopbackOption, 0);
+//加入组播地址
+udpSocket->joinMulticastGroup(QHostAddress("224.0.0.10"));
+//往组播发送数据
+udpSocket->writeDatagram("hello", QHostAddress("224.0.0.10"), 6789);
+//接收数据和UDP接收数据处理完全一致
+```
+
+315. 在Qt中结构体数据也是可以保存到ini配置文件，只不过保存后的数据是一堆qbytearray之类的字符，所以如果可读性优先，建议不要存储结构体数据，最起码也要是格式化后的结构体数据存储进去。要想用QSettings保存结构体数据，必须在结构体中重载实现输入输出数据流。
+```cpp
+struct ClientConfig {
+    int tabIndex;    
+    QString serverInfo;  
+
+    //重载数据流输出
+    friend QDataStream &operator << (QDataStream &out, const ClientConfig &clientConfig) {
+        out << clientConfig.tabIndex;        
+        out << clientConfig.serverInfo;        
+        return out;
+    }
+
+    //重载数据流输入
+    friend QDataStream &operator >> (QDataStream &in, ClientConfig &clientConfig)
+    {
+        in >> clientConfig.tabIndex;        
+        in >> clientConfig.serverInfo;        
+        return in;
+    }
+};
+
+//必须加上下面这句用来注册元数据类型,不然报错
+//error: static assertion failed: Type is not registered, please use the Q_DECLARE_METATYPE macro to make it known to Qt's meta-object system
+Q_DECLARE_METATYPE(ClientConfig)
+
+//定义
+ClientConfig clientConfig;
+
+//读取
+set.beginGroup("ClientConfig");
+clientConfig = set.value("clientConfig").value<ClientConfig>();
+set.endGroup();
+
+//写入
+set.beginGroup("ClientConfig");
+set.setValue("clientConfig", QVariant::fromValue(clientConfig)); 
+set.endGroup();
+```
+
+316. 将QPointF转成经纬度坐标字符串的时候，默认会丢失精度，导致计算错误，尤其是在转换成经纬度坐标的时候，可以发现偏差很大，所以在转换的时候需要指定精度。
+```cpp
+QPointF p(1.23456789, 2.3456789);
+QString p1 = QString("%1,%2").arg(p.x()).arg(p.y());
+QString p2 = QString("%1,%2").arg(p.x(), 0, 'f', 10).arg(p.y(), 0, 'f', 10);
+qDebug() << p1 << p2;
+//p1=1.23457,2.34568  p2=1.2345678900,2.3456789000
+```
+
+317. 在C++中经常会需要引入一些第三方或者系统的头文件，有时候你会发现，如果单单写个类，就引入这个文件，是没有任何问题的，而如果在前面还引入了Qt中的头文件比如 #include <QtNetwork> ，会编译通不过，报一些奇奇怪怪的问题，此时就要考虑引入的顺序问题，一般来说，要把Qt中的头文件放到后面来引入，就不会有问题，血淋淋的教训，折腾了很久才发现。貌似Qt中的头文件也会引入一些系统层面的头文件，而且还加了一些自己的定义，导致和第三方库的定义冲突了。一般来说msvc编译器最容易遇到这个现象，mingw出奇的正常。
+
+318. 当使用部分Qt内置的样式风格比如fusion的时候，QComboBox下拉框设置最大可见数量setMaxVisibleItems会失效，导致下拉框元素很多的时候，会填充整个屏幕，需要设置个样式就可以正常应用setMaxVisibleItems。ui->comboBox->setStyleSheet("combobox-popup:0;");
+
+319. 将字符串的浮点数转换成整型，会出现不可预期的结果，比如可能转换失败结果是0，不要以为这个转换会给你自动取整，其实不会的，除非本身是整型的字符串，这种规则只有在强类型的语言（比如c++/java）中才有，在弱类型的语言（比如js/python）中结果是正常的。这个规则要特别注意，那如果要正常转换怎么办？可以先转成浮点数再转整型即可。
+```cpp
+QString s = "12.563";
+//结果输出0
+qDebug() << s.toInt();
+//结果输出12
+qDebug() << s.toFloat();
+int i = s.toFloat();
+```
+
+
 ## 2 升级到Qt6
 ### 00：直观总结
 1. 增加了很多轮子，同时原有模块拆分的也更细致，估计为了方便拓展个管理。
@@ -4822,7 +5115,7 @@ QAudioInput *input = new QAudioInput(format, this);
 
 51. Qt6.5版本开始取消了QVariant的默认构造函数，之前return QVariant() 现在必须改成 QVariant(QVariant::Invalid) 才不会有警告提示。通过打印值发现QVariant()本身就=QVariant(QVariant::Invalid)，所以统一写成QVariant(QVariant::Invalid)兼容Qt456。
 
-## 3 Qt安卓经验
+## 3 安卓开发经验
 ### 01：01-05
 1. pro中引入安卓拓展模块 QT += androidextras 。
 2. pro中指定安卓打包目录 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android 指定引入安卓特定目录比如程序图标、变量、颜色、java代码文件、jar库文件等。
@@ -5134,7 +5427,21 @@ public class QtAndroidActivity extends QtActivity
 QJniObject::callStaticMethod<void>("org/qt/QtAndroidReceiver", "getBattery", "()V");
 ```
 
-## 4 Qt设计模式
+## 4 ffmpeg业余经验
+1. ffmpeg的库有链接顺序要求，如果不按照顺序来，也许在windows上没有问题，但是到了unix系统很可能有问题，报错提示云里雾里的找不到原因。顺序参照ffmpeg自带示例中的编译链接顺序即可。正确顺序是 LIBS += -L/ -lavformat -lavfilter -lavcodec -lswresample -lswscale -lavutil -lavdevice 。不是所有的库都是必须的，比如avdevice库，如果代码中没用上也没引用，可以不需要。
+2. ffmpeg解码中，av_find_best_stream第五个参数传入AVCodec的话，就直接获取到了值，而不用avcodec_find_decoder来处理。
+3. ffmpeg在解码的时候，avcodec_alloc_context3的参数AVCodec不是必须的，如果这里是NULL，则下面avcodec_open2的时候就必须传入。编码的时候在avcodec_alloc_context3的时候必须传入，否则下面打开失败。
+4. 解码阶段，每次av_read_frame后，使用完对应的packet数据，必须调用av_packet_unref，否则内存泄漏。编码阶段，每次av_write_frame后，里面会自动调用av_packet_unref。
+5. avpacket表示压缩的视音频数据（解码前和编码后），avframe表示未压缩的视音频数据（解码后和编码前），视音频文件以及传输都是使用压缩的数据，收到数据解码后才是未压缩的数据，才能直接绘制和播放。
+6. 解码对应av_read_frame/avcodec_send_packet/avcodec_receive_frame，编码对应avcodec_send_frame/avcodec_receive_packet/av_write_frame。可以看到命名非常规整，编码刚好和解码顺序相反。
+7. avcodec_send_packet和avcodec_receive_frame并不是一一对应的调用关系，而是一个avcodec_send_packet的调用，可能会对应多个avcodec_receive_frame函数的调用。因为解码器内部是有缓存和参考帧的，并不是每送进去一个数据包就能解码出一帧数据，可能出现送进去几个数据包，但是暂时没有数据帧解码输出的情况，也可能会出现某个时间点送进去一个数据包，然后会输出多个数据帧的情况。但是实际使用过程中你会发现你遇到过的99.9%的视音频文件或者流都是一对一关系，一个avcodec_send_packet就对应一次avcodec_receive_frame。
+8. 在ffmpeg函数接口中，有不少带数字结尾的函数，比如avcodec_alloc_context3、avcodec_decode_video2、avcodec_decode_audio4，这种一般就是不断迭代的结果。比如早期版本很可能有个函数avcodec_alloc_context，但是后面又新增了更完善的函数，又希望用户能够快速找到该函数，所以直接后面加个数字用以区分。这基本上都是程序员的惯例。如果是大版本的更新，可能旧的函数会主键废弃，甚至移除。一般建议用新的函数接口。
+9. 众多的音视频格式，是为了各种应用场景需求产生的，也是随着时代的发展需要应运而生的，主要就是为了方便压缩和传输，经过各种各样的算法标准。在ffmpeg中，通用的解码做法都是将任意视频格式解码转换成yuv（软解码）或者nv12（硬解码）数据，任意音频格式转换成pcm数据，yuv/nv12/pcm因为是原始的数据，所以体积非常大，优点就是非常通用，可以直接显示和播放。
+10. 要做音视频格式的转换，通用做法就是视频解码成yuv，音频解码成pcm，然后再由yuv编码成其他视频格式（对应转换对象SwsContext），pcm编码成其他音频格式（对应转换对象SwrContext），万变不离其中，唯一区别就是不同格式对应的各种参数不一样。音频转换这块可能还需要重采样。
+11. 无论是ffmpeg源码本身还是提供的示例demo，会发现里面大部分的代码都是在做判断，比如对象是否分配ok，大部分都提供返回值，负数表示失败，每一步执行后都需要判断是否ok再继续。其实这种写法是非常规范而且有必要的，可以避免程序意外崩溃段错误，而且就算出错也可以非常清晰的知道具体在哪一步，况且还增加了代码行数，何乐而不为。那有些人又要担心这会减慢程序运行速度，毕竟绝大部分的判断都是不会出现的，这里可以很负责任的告诉你，这个if判断，占用时间忽略不计，至少在纳秒级别。而且为了提高程序的健壮性稳定性，很有必要，尤其是C/C++这类程序。
+12. 很多初学者觉得ffmpeg很复杂，函数接口太多，或者流程繁琐，为什么不提供一个简易的接口呢？其实完全可以提供，只是在耦合性这块为了将各个组件独立，所以才会拆分出来各种库和接口。其实就是抽象出来为了各种场景需求，比如解码的时候，需要先通过avformat_find_stream_info获取流信息，然后将流信息中的codecpar复制给AVCodecContext，在av_read_frame读取到数据帧后，在解码调用avcodec_send_packet/avcodec_receive_frame的时候就需要这个AVCodecContext，这个流程永远如此，为什么ffmpeg不内部处理到复制呢？以为AVCodecContext还可以用于编码，而且各种参数信息可调，同时也是为了和AVStream以及其他独立开来，因为没有AVStream他也可以完成编解码，只要给到他需要的信息就行。随着你使用的深入，会发现这种设计才是最棒的。
+
+## 5 Qt设计模式
 **读《c++ Qt设计模式》书籍整理的一点经验。此书和官方的《C++ GUI Qt4编程》一起的。**
 1. 通常而言，好的做法是在包含了Qt头文件之后再包含非Qt头文件，由于Qt（为编译器和预处理器）定义了许多符号，这使得避免名称冲突变得更容易，也更容易找到文件。
 ```cpp
@@ -5175,15 +5482,15 @@ for (int i = 0; i < count; ++i) {
 
 9. 
 
-## 5 Qt大佬专区
-### 5.1 酷码大佬
+## 6 Qt大佬专区
+### 6.1 酷码大佬
 **微信：Kuma-NPC**
 1. 关于Qt事件传递的一个说明：
 - 通常写win32程序，鼠标消息应该是直接发给指定窗口句柄的，指定窗口没有处理就会转化成透传消息，交给父窗口处理。你在一个普通文字label上点击，父窗口也能收到鼠标事件。
 - Qt应该是所有消息都发给了顶层窗口，所以事件分发逻辑是自己处理，主窗口收到鼠标事件然后Qt自己分发给指定子控件，QEvent会有ignore或者accept表示自己处理了没有，例如鼠标点击事件，事件分发器发现没有被处理，数据重新计算然后分发给父窗口。这样父窗口收到的事件坐标就是基于自己窗口内的。用eventFilter就需要自己计算坐标。
 - 再比如，当使用QDialog，放一个QLineEdit并设置焦点，按Esc时QDialog也会自动关闭，本质上就是因为QLineEdit并不处理Esc的按键事件，透传给了QDialog。
 
-### 5.2 小豆君
+### 6.2 小豆君
 1. 无论你是学Qt，Java，Python或其它，都需要明白一个道理：摒弃掉你的好奇心，千万不要去追求第三方类或工具是怎么实现的，这往往会让你收效甚微，其实，你只需要熟练掌握它的接口，知道类的目的即可，不可犯面向过程的毛病，刨根问底。记住，你的目标是让其它工具为你服务，你要踩在巨人的肩膀上创造世界。
 
 2. Qt真正的核心：元对象系统、属性系统、对象模型、对象树、信号槽。往死里啃这五大特性，在你的项目中，逐渐的设法加入这些特性，多多练习使用它们，长此以往你会收获意想不到的效果。
@@ -5192,7 +5499,7 @@ for (int i = 0; i < count; ++i) {
 
 4. 在阅读Qt的帮助文档时，要静下心来，不要放过每一句，记住在文档中没有废话，尤其是每段的开头。
 
-## 6 其他经验
+## 7 其他经验
 1. Qt界的中文乱码问题，版本众多导致的如何选择安装包问题，如何打包发布程序的问题，堪称Qt界的三座大山！
 
 2. 在Qt的学习过程中，学会查看对应类的头文件是一个好习惯，如果在该类的头文件没有找到对应的函数，可以去他的父类中找找，实在不行还有爷爷类，肯定能找到的。通过头文件你会发现很多函数接口其实Qt已经帮我们封装好了，有空还可以阅读下他的实现代码。
@@ -5255,10 +5562,25 @@ for (int i = 0; i < count; ++i) {
 
 18. Qt绝对是个非常牛逼的项目，源码非常庞大，而且分模块设计，对于有足够精力的可以花时间学习源码中的具体实现，如果时间不多，个人推荐看 QObject、QWidget、QPainter、QString、QColor、QList、QVariant、QAbstractButton、QAbstractItemModel、qnamespace.h（整个Qt中所有的全局的枚举值）、这些类的源码即可，看看他们有哪些方法和属性，对自己的编程会有莫大的帮助。
 
-19.  最后一条：珍爱生命，远离编程。祝大家头发浓密，睡眠良好，情绪稳定，财富自由！
+19. 不知道出于什么原因考虑，Qt官方目前不提供离线的安装包下载，意味着网上各种文章提供的各种下载地址都失效了，会提示Download from your IP address is not allowed，当然目前可以在线安装，但是据说只提供了从5.15开始的版本，早期的5.12之类的版本很难再下载到，于是这块需求居然还衍生了一门生意。其实还是可以下载到的，只是需要自己组织对应的下载地址，都是有规律的，然后用迅雷等下载工具下载。
+```cpp
+//5.12.12 对应windows安装包
+https://download.qt.io/archive/qt/5.12/5.12.12/qt-opensource-windows-x86-5.12.12.exe
 
-## 7 杂七杂八
-### 7.1 推荐开源主页
+//5.12.12 对应linux安装包
+https://download.qt.io/archive/qt/5.12/5.12.12/qt-opensource-linux-x64-5.12.12.run
+
+//5.12.12 对应mac安装包
+https://download.qt.io/archive/qt/5.12/5.12.12/qt-opensource-mac-x64-5.12.12.dmg
+
+//5.12.0 对应windows安装包
+https://download.qt.io/archive/qt/5.12/5.12.0/qt-opensource-windows-x86-5.12.0.exe
+```
+
+20.  最后一条：珍爱生命，远离编程。祝大家头发浓密，睡眠良好，情绪稳定，财富自由！
+
+## 8 杂七杂八
+### 8.1 推荐开源主页
 |名称|网址|
 |:------ |:------|
 |Qt/C++学习高级群|751439350|
@@ -5266,7 +5588,7 @@ for (int i = 0; i < count; ++i) {
 |QtQuick/Qml开源demo集合|[https://gitee.com/jaredtao/TaoQuick](https://gitee.com/jaredtao/TaoQuick)|
 |QtQuick/Qml开源demo集合|[https://gitee.com/zhengtianzuo/QtQuickExamples](https://gitee.com/zhengtianzuo/QtQuickExamples)|
 
-### 7.2 推荐网站主页
+### 8.2 推荐网站主页
 |名称|网址|
 |:------|:------|
 |qtcn|[http://www.qtcn.org](http://www.qtcn.org)|
@@ -5288,7 +5610,7 @@ for (int i = 0; i < count; ++i) {
 |涛哥的知乎专栏|[https://zhuanlan.zhihu.com/TaoQt](https://zhuanlan.zhihu.com/TaoQt)|
 |Qt君|[https://blog.csdn.net/nicai_xiaoqinxi](https://blog.csdn.net/nicai_xiaoqinxi)|
 
-### 7.3 推荐学习网站
+### 8.3 推荐学习网站
 |名称|网址|
 |:------|:------|
 |Qt老外视频教程|[http://space.bilibili.com/2592237/#!/index](http://space.bilibili.com/2592237/#!/index)|
@@ -5306,6 +5628,7 @@ for (int i = 0; i < count; ++i) {
 |qss学习地址1|[http://47.100.39.100/qtwidgets/stylesheet-reference.html](http://47.100.39.100/qtwidgets/stylesheet-reference.html)|
 |qss学习地址2|[http://47.100.39.100/qtwidgets/stylesheet-examples.html](http://47.100.39.100/qtwidgets/stylesheet-examples.html)|
 |qss学习地址3|[https://doc.qt.io/qt-6/qstyle.html](https://doc.qt.io/qt-6/qstyle.html)|
+|查看模块协议|[https://www.qt.io/product/features](https://www.qt.io/product/features)|
 |精美图表控件Qwt|[http://qwt.sourceforge.net/](http://qwt.sourceforge.net/)|
 |精美图表控件QCustomPlot|[https://www.qcustomplot.com/](https://www.qcustomplot.com/)|
 |精美图表控件JKQtPlotter|[https://github.com/jkriege2/JKQtPlotter/](https://github.com/jkriege2/JKQtPlotter/)| 
@@ -5315,7 +5638,7 @@ for (int i = 0; i < count; ++i) {
 |基于Qt+ffmpeg的多媒体组件QtAV|[https://github.com/wang-bin/QtAV/](https://github.com/wang-bin/QtAV/)|
 |QtAV作者最新力作mdk-sdk|[https://github.com/wang-bin/mdk-sdk/](https://github.com/wang-bin/mdk-sdk/)|
 
-## 8 书籍推荐
+## 9 书籍推荐
 1. C++入门书籍推荐《C++ primer plus》，进阶书籍推荐《C++ primer》。
 2. Qt入门书籍推荐霍亚飞的《Qt Creator快速入门》，Qt进阶书籍推荐官方的《C++ GUI Qt4编程》，qml书籍推荐《Qt5编程入门》，Qt电子书强烈推荐《Qt5.10 GUI完全参考手册》。
 3. 强烈推荐程序员自我提升、修养、规划系列书《走出软件作坊》《大话程序员》《程序员的成长课》《解忧程序员》，受益匪浅，受益终生！
