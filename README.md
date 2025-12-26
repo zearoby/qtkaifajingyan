@@ -46,7 +46,7 @@ timer->start(5000);
 
 5. 很多时候找到Qt对应封装的方法后，记得多看看该函数的重载，多个参数的，你会发现不一样的世界，有时候会恍然大悟，原来Qt已经帮我们封装好了，比如QString、QColor的重载参数极其丰富，很多你做梦都想要的功能就在里面。
 
-6. 可以在pro文件中写上版本号、程序图标、产品名称、版权所有、文件说明等信息（Qt5才支持），其实在windows上就是qmake的时候会自动将此信息转换成rc文件。对于早期的Qt4版本你可以手动写rc文件实现。
+6. 可以在pro文件中写上版本号、程序图标、产品名称、版权所有、文件说明等信息（Qt5开始才支持），其实在windows上就是qmake的时候会自动将此信息转换成rc文件。可以在pro文件中写一行VERSION=xxx，编译后就会在编译文件目录有个resource.rc文件，可以记事本打开查看内容。对于早期的Qt4版本，只能手动写rc文件，然后pro加上 RC_FILE = main.rc。QMAKE_TARGET这种前缀标记是5.8版本开始支持的，qmake 会根据平台自动将其转换为相应的资源文件。
 ```cpp
 #程序版本
 VERSION  = 2025.10.01
@@ -1526,8 +1526,10 @@ if (!edit->text().isEmpty()) {
 147. Qt内置了各种对话框，比如文件对话框-QFileDialog ，颜色对话框-QColorDialog ，默认都会采用系统的对话框风格样式，这样可以保持和系统一致，如果不需要的话可以取消该特性，取消以后会采用Qt自身的对话框，这样才能进行美化和其他处理。
 ```cpp
 QFileDialog *fileDialog = new QFileDialog(this);
-//不设置此属性根本查找不到任何子元素,因为默认采用的系统对话框
+//不设置此属性根本查找不到任何子元素/因为默认采用的系统对话框
 fileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
+//设置只读属性/禁用新建目录
+fileDialog->setOption(QFileDialog::ReadOnly, true);
 qDebug() << fileDialog->findChildren<QLabel *>();
 //打印输出 QLabel(0x17e2ff68, name="lookInLabel"), QLabel(0x17e35f88, name="fileNameLabel"), QLabel(0x17e35e68, name="fileTypeLabel")
 ```
@@ -4671,10 +4673,10 @@ void QtHelper::search(QTreeWidget *treeWidget, const QString &key, int level)
 }
 ```
 
-314. 在Qt中实现组播是非常容易的事情，从4.8开始支持组播，为啥要用组播而不是广播？因为广播会产生广播数据风暴，每个设备都会收到，而且针对某个网段的广播比如192.168.0.255，不能跨网段。而组播不仅可以跨网段，还不会出现数据风暴，只对加入了组播的目标进行数据发送，非常适合用来做局域网设备搜索和配置。在测试过程中，如果是两台真机之间测试组播，没有问题，但是很多时候开发机只有一台，最多就是在开发机上安装了虚拟机，可以有多个系统可以测试，那么问题来了，虚拟机之间的组播需要经过设置才能正常通信。第一点就是虚拟机的网络必须是桥接模式，也就是网络地址和宿主主机同一网段。第二点最关键，需要在两个虚拟机产生的网卡设备（VMware Network Adapter VMnet1/VMware Network Adapter VMnet8）右键属性进去设置，在此连接使用下列项目中勾选一个VMware Bridge Protocol确定，重启网卡即可。
+314. 在Qt中实现组播是非常容易的事情，从4.8开始支持组播，为啥要用组播而不是广播？因为广播会产生广播数据风暴，每个设备都会收到，而且针对某个网段的广播比如192.168.0.255，不能跨网段。而组播不仅可以跨网段，还不会出现数据风暴，只对加入了组播的目标进行数据发送，非常适合用来做局域网设备搜索和配置。在测试过程中，如果是两台真机之间测试组播，没有问题，但是很多时候开发机只有一台，最多就是在开发机上安装了虚拟机，可以有多个系统可以测试，那么问题来了，虚拟机之间的组播需要经过设置才能正常通信。第一点就是虚拟机的网络必须是桥接模式，也就是网络地址和宿主主机同一网段。第二点最关键，需要在两个虚拟机产生的网卡设备（VMware Network Adapter VMnet1/VMware Network Adapter VMnet8）右键属性进去设置，在此连接使用下列项目中勾选一个VMware Bridge Protocol确定，重启网卡即可。还有个可能导致绑定组播失败，那就是多网卡的情况，需要joinMulticastGroup第二个参数指定网卡。
 ```cpp
 //绑定端口
-udpSocket->bind(QHostAddress("0.0.0.0"), 6789);
+udpSocket->bind(QHostAddress("0.0.0.0"), 6789, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint);
 //设置组播数据不给自己发送/一般都会有这个设置/防止数据又发给自己造成死循环
 udpSocket->setSocketOption(QAbstractSocket::MulticastLoopbackOption, 0);
 //加入组播地址
@@ -4682,6 +4684,27 @@ udpSocket->joinMulticastGroup(QHostAddress("224.0.0.10"));
 //往组播发送数据
 udpSocket->writeDatagram("hello", QHostAddress("224.0.0.10"), 6789);
 //接收数据和UDP接收数据处理完全一致
+
+//获取指定IP对应的网卡索引
+int OnvifSearchServer::getInterfaces(const QString &ip)
+{
+    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+    for (int i = 0; i < interfaces.count(); ++i) {
+        QList<QNetworkAddressEntry> addrs = interfaces.at(i).addressEntries();
+        foreach (QNetworkAddressEntry addr, addrs) {
+            if (addr.ip().toString() == ip) {
+                return i;
+            }
+        }
+    }
+
+    return -1;
+}
+
+//指定网卡绑定组播/防止绑定失效/也就是绑定成功但是未必是你需要的网卡
+int index = getInterfaces(ip);
+QNetworkInterface interface = QNetworkInterface::allInterfaces().at(index);
+udpSocket->joinMulticastGroup(QHostAddress("239.255.255.250"), interface);
 ```
 
 315. 在Qt中结构体数据也是可以保存到ini配置文件，只不过保存后的数据是一堆qbytearray之类的字符，所以如果可读性优先，建议不要存储结构体数据，最起码也要是格式化后的结构体数据存储进去。要想用QSettings保存结构体数据，必须在结构体中重载实现输入输出数据流。
@@ -4747,6 +4770,145 @@ qDebug() << s.toFloat();
 int i = s.toFloat();
 ```
 
+320. 关于QByteArray变量取值注意事项的衍生问题。
+```cpp
+QString s = "abc";
+//变量c的值很可能不正确/toUtf8后是个临时变量
+char *c = s.toUtf8().data();
+//需要分成两步
+QByteArray b = s.toUtf8();
+char *c = b.data();
+
+//那么问题来了/下面这个b有没有问题
+QByteArray b = s.toUtf8().toBase64();
+//其实没有问题的/因为toBase64后返回的是一个新的对象
+//99%的人看到c有问题以为b也有问题
+```
+
+### 33：321-330
+321. 民间一直流传QString最多只能带9个占位符，其实是错误的，个人认为QString类是Qt中封装的最牛逼类之一，不接受反驳，他提供了多种占位符使用方式，关于民间说的最多支持9个占位符，那是直接在一个arg中填入多个参数的方式，这个确实限制了最多就只能填9个参数值。其实QString中还有个频繁的用法是链式调用，也就是.arg().arg()一直下去，这样就突破了9个的限制，要多少个都可以，而且链式调用的方式可以传入所有支持的数据类型，可以是int也可以是QString，而重载版本最多支持9个且必须是QString字符串类型。还有个很容易忽略的细节就是，占位符对应的第一个值是%1还是%0？其实都不是，而是按照填写的最小的那个数字开始的，如果占位符中最小的是%2，则这个对应的就是第一个参数值。
+```cpp
+//输出 "0 1 2 3 4 5 6 7 8 9 10"
+QString s1 = QString("%0 %1 %2 %3 %4 %5 %6 %7 %8 %9 %10").arg(0).arg(1).arg(2).arg(3).arg(4).arg(5).arg(6).arg(7).arg(8).arg(9).arg(10);
+
+//输出 "0 1 2 3 4 5 6 7 8 %9 %10"
+QString s2 = QString("%0 %1 %2 %3 %4 %5 %6 %7 %8 %9 %10").arg("0", "1", "2", "3", "4", "5", "6", "7", "8");
+
+//输出 "a b c"
+QString s3 = QString("%2 %3 %4").arg("a").arg("b").arg("c");
+```
+
+322. 在对单次定时器使用lam表达式过程中，如果在线程中执行代码，会发现执行失败，需要异步执行。
+```cpp
+//下面这段代码在线程中会执行失败
+QTimer::singleShot(3000, [this]() {
+    ...        
+});
+
+//改成异步执行就行/相当于主线程执行
+QMetaObject::invokeMethod(this, [this]() {
+    QTimer::singleShot(3000, [this]() {
+        ...
+    });
+}, Qt::QueuedConnection);
+```
+
+323. 在使用qDebug和其他日志打印函数输出日志的时候，一般会希望打印时间戳和代码行等信息，从Qt5开始，内置了对应的宏来实现，很多人会选择在打印的代码处加上对应的宏来实现，其实Qt5开始就提供了qSetMessagePattern来统一设置，设置以后根本不需要每行打印代码都写上时间戳或者代码行对应宏等，直接写自己打印的内容就行，会自动在打印的时候填充加上你设置的附加内容。
+```cpp
+//Qt4的时候没有这些功能/只能手动打印
+qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss zzz") << "xxx";
+
+//可以统一定义一个宏再打印/不用每个地方都写重复的代码
+#define TIMEMS qPrintable(QTime::currentTime().toString("HH:mm:ss zzz"))
+#define DATETIME qPrintable(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"))
+qDebug() << DATETIME << "xxx";
+
+//设置一次搭档内容/其他地方只需要输出内容即可
+qSetMessagePattern("[%{time yyyy-MM-dd hh:mm:ss zzz}] - %{message}");
+//下面打印输出 [2025-06-15 14:30:45 568] - xxx
+qDebug() << "xxx";
+```
+
+324. QString字符串操作中容易忽略的几个小细节。
+- 在使用indexOf判断是否包含某个字符的时候，建议使用indexOf(',')，而不是indexOf(",")，查找单个字符效率极高。只有确实需要查找多个字符的时候，才建议用indexOf("xxx")。
+- 同理，和indexOf方法类似，其他方法比如section/split等，单个字符串查找，都建议用(',')而不是(",")，性能会有极大提升。
+- 截取字符串一般会选择用mid(2, 5)函数，如果要截取某个索引开始后面所有字符，以前经常写成 s.mid(2, s.size()) 这种，其实第二个参数可以不填，默认不填就表示到结尾。
+- 分割字符串在某些场景写可以用section而不是split，比如文件路径截取或者IP地址截取。
+```cpp
+//直接使用section截取字符串的前面部分再拼起来/不容易理解
+QString head = ip.section('.', 0, 2);
+QString ip2 = head + "." + QString::number(123);
+
+//使用split分割字符串/很容易理解
+QStringList list = ip.split('.');
+list[3] = QString::number(123);
+QString ip3 = list.join('.');
+
+//输出 "192.168.0" "192.168.0.123" "192.168.0.123"
+qDebug() << head << ip2 << ip3;
+```
+
+325. 如何判断当前系统是嵌入式arm，在早期比如2010年的时候基本上是在代码中 #ifde __arm__ 来判断，谁知道后面基本上都是64位的嵌入式，你不要想当然的以为加个 #ifde __arm64__ ，其实是 #ifde __aarch64__ ，因为编译器基本上用的aarch，那有没有可能后面又增加其他类型的呢，是很有可能的，所以最佳方案就是在pro中识别到，然后定义一个标志，最后代码中统一用这个标志判断是否是arm即可。
+```cpp
+//pro中判断
+contains(QT_ARCH, arm) | contains(QT_ARCH, arm64) {
+DEFINES + QT_ARM_ARCH
+}
+
+//有个通用写法
+contains(QT_ARCH, arm.*) {
+DEFINES + QT_ARM_ARCH
+}
+
+//代码中判断/如果需要增加其他/每个代码的地方都需要改动
+#if defined(__arm__) || defined(__aarch64__)
+#endif
+
+//代码中判断/如果需要增加其他/只需要pro中改动一个地方即可
+#ifdef QT_ARM_ARCH
+#endif
+```
+
+326. Qt中QByteArray和16进制互转，其实已经内置了方法，之前还傻傻的逐个计算。
+```cpp
+QString IotHelper::byteArrayToHexStr(const QByteArray &data)
+{
+    //下面几个点就表示几个字符
+    QString result = data.toHex();
+#if (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
+    result.replace(QRegularExpression("(..)"), "\\1 ");
+#else
+    result.replace(QRegExp("(..)"), "\\1 ");
+#endif
+    return result;
+}
+
+QByteArray IotHelper::hexStrToByteArray(const QString &data)
+{
+    //以前还傻傻的自己去逐个计算/原来已经内置了/支持带空格和不带空格
+    return QByteArray::fromHex(data.toUtf8());
+}
+```
+
+327. 关于在Qt中使用QThread::msleep延时的特别注意事项。
+```cpp
+QElapsedTimer timer;
+timer.start();
+QThread::msleep(1);
+qDebug() << timer.elapsed();
+```
+- 理论上来说执行上面这段代码，会打印1，也就是延时1ms，实际情况是半数人的电脑会打印1，有些会打印2-5，离谱的是有些会打印20-30，是不是觉得很离谱？
+- 如果是偶尔打印一次20-30，也能够理解，毕竟我们用的操作系统都不是实时操作系统，如果遇到后台任务很多的情况，或者某个进行占用在密集运算的时候，是有可能的。
+- 问题是，在这种电脑上，会一直打印20-30，也就说明并不是偶发情况，是频发情况，难道是开启了节能模式导致的？
+- 所以有些人用这个延时来控制生产消费者队列，就很容易得不到预期的结果，比如1s存入了100个数据，处理一个数据就休息1ms，理论上是可以正常运行的，实际上上有些电脑每次休息1ms实际上休息了30ms，这就导致队列中的数据越来越多。
+- 还有些人用这个延时来控制视频播放，比如fps25帧的视频文件，每次播放完整一帧就休息40ms，这样刚好1s就播放25帧，实际发现有些电脑慢的离谱，问题就出在延时这里。
+- 那如果希望实现定时处理一个任务，可以考虑用定时器，如果担心卡主，可以通过movetothread在线程中使用定时器，然后设置定时器类型为高精度定时器，QTimer *timer = new QTimer; timer->setTimerType(Qt::PreciseTimer);
+
+328. QMap内部会排序，如何设置不要排序？有些人说换成QHash，其实QHash内部使用哈希值排序，也就是并不是按照插入的顺序来存储的，如果一定要求按照插入顺序存储，需要考虑使用 QList<QPair<Key, Value>> 或者 std::vector<std::pair<Key, Value>> 这样的序列容器。如果是json数据的构建，建议用QHash，速度最快无顺序，因为json解析本身就是不需要顺序的。总之QMap严格按照key排序，QHash按照内部的哈希值排序，QList<QPair>按照插入顺序排序。
+
+329. 同一个UI界面上，如果子UI和主UI有同名对象，然后使用的on_obj_slot这种方式，让Qt内部调用connectSlotsByName自动关联的信号槽，会导致信号槽错乱，https://bugreports.qt.io/browse/QTBUG-49749，建议取不同名字，或者手动connect去关联信号槽，保证不会出错。
+
+330. 一个高分屏缩放引发的血案，在Qt5中QWidget的devicePixelRatio()是int类型，Qt6中是qreal类型，也就是说在Qt6中这个函数返回的是准确的浮点值，而在Qt5中是整数值，这就导致在Qt5中很多计算不准确，必须要用devicePixelRatioF()这个函数。怪不得之前总有人反馈那个无边框窗体在高分屏有问题，而我这里测试的又是没问题的，因为我这测试的Qt6本来就不会出问题，而Qt5中我这强制写死的用QApplication::setAttribute(Qt::AA_Use96Dpi)，不会去开启缩放。确切的说应该是Qt5中不严谨导致的，因为Qt5中的QScreen::devicePixelRatio()这个函数也是qreal的，所以在Qt6中全部统一了。血淋淋的教训。
 
 ## 2 升级到Qt6
 ### 00：直观总结
